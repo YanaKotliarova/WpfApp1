@@ -1,4 +1,5 @@
 ﻿using System.Windows;
+using WpfApp1.ViewModel;
 
 namespace WpfApp1
 {
@@ -10,7 +11,7 @@ namespace WpfApp1
         public MainWindow()
         {
             InitializeComponent();
-            DataContext = new CSVFile();
+            DataContext = new MainWindowViewModel();
         }
     }
 }

@@ -3,25 +3,28 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:WpfApp1"
+        xmlns:local="clr-namespace:WpfApp1" 
+        xmlns:viewmodel="clr-namespace:WpfApp1.ViewModel"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
     <Grid>
         <TextBox x:Name="textBoxMain" TextWrapping="Wrap" AcceptsReturn="True" 
                  Margin="30,36,0,0" VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Auto" 
-                 ScrollViewer.CanContentScroll="True" HorizontalAlignment="Left" VerticalAlignment="Top" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" Width="620" Height="150"/>
+                 ScrollViewer.CanContentScroll="True" HorizontalAlignment="Left" VerticalAlignment="Top" HorizontalContentAlignment="Stretch" 
+                 VerticalContentAlignment="Stretch" Width="620" Height="150" 
+                 IsReadOnly="True" Text = "{Binding MainText, UpdateSourceTrigger = PropertyChanged}"/>
 
-        <Button x:Name="buttonChooseFile" Command="{Binding AddCommand}" Content="Открыть" Margin="687,36,0,0" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" HorizontalAlignment="Left" VerticalAlignment="Top" Height="25" Width="78" />
-        <Button x:Name="buttonExport" Content="Экспорт" Margin="688,339,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Height="25" Width="76" />
+        <Button x:Name="buttonChooseFile" Command="{Binding ReadCsvFileCommandAndAddToBD}" Content="Открыть" Margin="687,36,0,0" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" HorizontalAlignment="Left" VerticalAlignment="Top" Height="25" Width="78" />
+        <Button x:Name="buttonExport" Command="{Binding ExportIntoFile}" Content="Экспорт" Margin="688,339,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Height="25" Width="76" />
 
-        <DatePicker x:Name="datePicker" Height="25" VerticalAlignment="Top" Margin="320,249,358,0" VerticalContentAlignment="Center"/>
+        <DatePicker x:Name="datePicker" SelectedDate="{Binding DatePicker}" Height="25" VerticalAlignment="Top" Margin="320,249,358,0" VerticalContentAlignment="Center"/>
 
-        <TextBox x:Name="textBoxFirstName" Height="25" VerticalAlignment="Top" Margin="100,249,578,0" VerticalContentAlignment="Center"/>
-        <TextBox x:Name="textBoxLastName" Height="25" VerticalAlignment="Top" Margin="100,289,578,0" VerticalContentAlignment="Center"/>
-        <TextBox x:Name="textBoxPatronymic" Height="25" VerticalAlignment="Top" Margin="100,330,578,0" VerticalContentAlignment="Center"/>
-        <TextBox x:Name="textBoxCity"  Height="25" VerticalAlignment="Top" Margin="320,289,358,0" VerticalContentAlignment="Center"/>
-        <TextBox x:Name="textBoxCountry" Height="25" VerticalAlignment="Top" Margin="320,330,358,0" VerticalContentAlignment="Center"/>
-        <TextBox x:Name="textBoxFileName" Height="25" VerticalAlignment="Top" Margin="496,249,182,0" VerticalContentAlignment="Center"/>
+        <TextBox x:Name="textBoxFirstName" Text="{Binding FirstNameTextBox}" Height="25" VerticalAlignment="Top" Margin="100,249,578,0" VerticalContentAlignment="Center"/>
+        <TextBox x:Name="textBoxLastName" Text="{Binding LastNameTextBox}" Height="25" VerticalAlignment="Top" Margin="100,289,578,0" VerticalContentAlignment="Center"/>
+        <TextBox x:Name="textBoxPatronymic" Text="{Binding PatronymicTextBox}" Height="25" VerticalAlignment="Top" Margin="100,330,578,0" VerticalContentAlignment="Center"/>
+        <TextBox x:Name="textBoxCity" Text="{Binding CityTextBox}" Height="25" VerticalAlignment="Top" Margin="320,289,358,0" VerticalContentAlignment="Center"/>
+        <TextBox x:Name="textBoxCountry" Text="{Binding CountryTextBox}" Height="25" VerticalAlignment="Top" Margin="320,330,358,0" VerticalContentAlignment="Center"/>
+        <TextBox x:Name="textBoxFileName" Text="{Binding FileNameTextBox}" Height="25" VerticalAlignment="Top" Margin="496,249,182,0" VerticalContentAlignment="Center"/>
 
         <Label x:Name="labelFirstName" Content="Имя:" Margin="30,249,658,105" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" HorizontalAlignment="Left" VerticalAlignment="Top"/>
         <Label x:Name="labelLastName" Content="Фамилия:" Margin="30,289,605,47" HorizontalAlignment="Left" VerticalAlignment="Top" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch"/>
@@ -34,8 +37,16 @@
 
         <Label x:Name="labelExplanation" Content="Введите данные для выборки для экспорта:" Margin="30,205,162,10" HorizontalAlignment="Left" VerticalAlignment="Top" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch"/>
 
-        <RadioButton x:Name="radioButtonExcel" Content="Excel файл (.xlsx)" Margin="660,249,-109,80" HorizontalAlignment="Left" VerticalAlignment="Top" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch"/>
-        <RadioButton x:Name="radioButtonXml" Content="XML файл (.xml)" Margin="660,289,-120,-13" HorizontalAlignment="Left" VerticalAlignment="Top" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch"/>
+        <RadioButton x:Name="radioButtonExcel" 
+                     Command="{Binding SelectFileFormat}" CommandParameter=".xlsx"
+                     Content="Excel файл (.xlsx)" 
+                     Margin="660,249,-109,80" HorizontalAlignment="Left" VerticalAlignment="Top" 
+                     HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch"/>
+        <RadioButton x:Name="radioButtonXml" 
+                     Command="{Binding SelectFileFormat}" CommandParameter=".xml"
+                     Content="XML файл (.xml)" 
+                     Margin="660,289,-120,-13" HorizontalAlignment="Left" VerticalAlignment="Top" 
+                     HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch"/>
 
     </Grid>
 </Window>

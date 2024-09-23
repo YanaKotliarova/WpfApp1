@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations;
 
-namespace WpfApp1
+namespace WpfApp1.Model
 {
     internal class User
     {
@@ -17,6 +12,9 @@ namespace WpfApp1
         public string Patronymic { get; set; }
         public string City { get; set; }
         public string Country { get; set; }
+
+        internal List<User> ListOfUsersFromFile = new List<User>();
+        internal List<User> ListOfUsersFromDB = new List<User>();
 
         public User() { }
 
