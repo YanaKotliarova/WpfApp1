@@ -28,7 +28,7 @@ namespace WpfApp1.Model
             try
             {
                 if (ListOfUsersFromDB.IsNullOrEmpty())
-                    throw new Exception("Выборка не была осуществена!");
+                    throw new Exception("Выборка не была осуществена!\r\nПроверьте введённые данные.");
 
                 XDocument xDoc = new XDocument();
                 XElement users = new XElement(UsersWord);
@@ -55,7 +55,7 @@ namespace WpfApp1.Model
             }
             catch (Exception ex)
             {
-                uIWorking.ShowMessage("Не удалось создать XML файл!");
+                uIWorking.ShowMessage("Не удалось создать XML файл!" + ex.Message);
             }
         }
     }

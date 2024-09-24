@@ -28,7 +28,7 @@ namespace WpfApp1.Model
             try
             {
                 if (ListOfUsersFromDB.IsNullOrEmpty())
-                    throw new Exception("Выборка не была осуществена!");
+                    throw new Exception("Выборка не была осуществена!\r\nПроверьте введённые данные.");
 
                 ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
 
@@ -62,7 +62,7 @@ namespace WpfApp1.Model
             }
             catch (Exception ex)
             {
-                uIWorking.ShowMessage("Не удалось создать Excel файл!\r\n" + ex);
+                uIWorking.ShowMessage("Не удалось создать Excel файл!\r\n" + ex.Message);
             }
         }
     }

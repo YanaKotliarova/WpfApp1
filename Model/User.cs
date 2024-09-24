@@ -19,18 +19,19 @@ namespace WpfApp1.Model
         public User() { }
 
         /// <summary>
-        /// Конструктор класса User, принимающий в качестве параметра массив строк,
-        /// содержащий в себе дату, имя, фамилию, отчество, город и страну пользователя.
+        /// Конструктор класса User, принимающий в качестве параметра две структуры данных о пользователе,
+        /// содержащий в себе дату входа, имя, фамилию, отчество, город и страну пользователя.
         /// </summary>
-        /// <param name="data"> Массив строк. </param>
-        public User(string[] data)
+        /// <param name="person"></param>
+        /// <param name="entranceInfo"></param>
+        public User(PersonStruct person, EntranceInfoStruct entranceInfo)
         {
-            Date = DateOnly.Parse(data[0]);
-            FirstName = data[1];
-            LastName = data[2];
-            Patronymic = data[3];
-            City = data[4];
-            Country = data[5];
+            Date = DateOnly.Parse(entranceInfo.DateOfEntrance);
+            FirstName = person.FirstName;
+            LastName = person.LastName;
+            Patronymic = person.Patronymic;
+            City = entranceInfo.City;
+            Country = entranceInfo.Country;
         }
     }
 }

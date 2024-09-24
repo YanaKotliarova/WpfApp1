@@ -26,7 +26,12 @@ namespace WpfApp1.Model
                     while ((stringFromFile = await streamReader.ReadLineAsync()) != null)
                     {
                         dataFromString = stringFromFile.Split(Semicolon);
-                        newUser = new User(dataFromString);
+
+                        PersonStruct person = new PersonStruct(dataFromString[1], dataFromString[2], dataFromString[3]);
+                        EntranceInfoStruct entranceInfo = new EntranceInfoStruct(dataFromString[0], dataFromString[4], dataFromString[5]);
+
+                        newUser = new User(person, entranceInfo);
+
                         ListOfUsersFromFile.Add(newUser);
                     }
                 }

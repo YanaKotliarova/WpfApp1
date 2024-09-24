@@ -20,7 +20,7 @@ namespace WpfApp1.ViewModel
         XmlFile xmlFile = new XmlFile();
         UIWorking uiWorking = new UIWorking();
 
-        private string _fileExtension;
+        private string _fileExtension = "Выберите формат файла!";
 
         private string _mainTextBoxText = "Выберите, пожалуйста, файл!\t\t\t\t\t\t\t--------->\r\n(в формате csv)";
         public string MainText
@@ -66,16 +66,16 @@ namespace WpfApp1.ViewModel
                             newFileName = FileNameTextBox;
 
                         string date = dataBase.FormateDate(DatePicker);
+                        string firstName = dataBase.FormateStringData(FirstNameTextBox);            
+                        string lastName = dataBase.FormateStringData(LastNameTextBox);
+                        string patronymic = dataBase.FormateStringData(PatronymicTextBox);
+                        string city = dataBase.FormateStringData(CityTextBox);
+                        string country = dataBase.FormateStringData(CountryTextBox);
 
-                        string firstName = FirstNameTextBox;
-                        string lastName = LastNameTextBox;
-                        string patronymic = PatronymicTextBox;
-                        string city = CityTextBox;
-                        string country = CountryTextBox;
+                        PersonStruct person = new PersonStruct(firstName, lastName, patronymic);
+                        EntranceInfoStruct entranceInfo = new EntranceInfoStruct(date, city, country);
 
-                        string[] dataForExport = { date, firstName, lastName, patronymic, city, country };
-
-                        user.ListOfUsersFromDB = await dataBase.GetFromDBAsync(dataForExport, user.ListOfUsersFromDB);
+                        user.ListOfUsersFromDB = await dataBase.GetFromDBAsync(person, entranceInfo, user.ListOfUsersFromDB);
 
                         OutputUsersToTextbox(user.ListOfUsersFromDB);
 
@@ -115,7 +115,6 @@ namespace WpfApp1.ViewModel
                             _fileExtension = ExcelExtension;
                         else if (obj.Equals(XmlExtension))
                             _fileExtension = XmlExtension;
-                        else _fileExtension = "Выберите формат файла!";
                     }
                     ));
             }
