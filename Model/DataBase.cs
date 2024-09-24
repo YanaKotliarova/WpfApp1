@@ -1,10 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using System.Diagnostics.Metrics;
-using System.Reflection;
-using System.Windows.Markup;
 using WpfApp1.View;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace WpfApp1.Model
 {
@@ -15,9 +11,12 @@ namespace WpfApp1.Model
         private const string Dash = "-";
         private const string Percent = "%";
 
-        //private const int AmountOfUsersForSelection = 3;
+        private const int AmountOfUsersForSelection = 3;
 
-        UIWorking uIWorking = new UIWorking();
+        internal int amoutOfUsersInDB = 0;
+        internal int amountOfViewedUsers = 0;
+
+        UIWorking uiWorking = new UIWorking();
 
 
         /// <summary>
@@ -28,7 +27,7 @@ namespace WpfApp1.Model
         {
             using (ApplicationContext db = new ApplicationContext())
             {
-                await db.Database.EnsureDeletedAsync();
+                //await db.Database.EnsureDeletedAsync();
                 await db.Database.EnsureCreatedAsync();
 
                 foreach (User user in ListOfUsersFromFile)
@@ -52,7 +51,9 @@ namespace WpfApp1.Model
             {
                 using (ApplicationContext db = new ApplicationContext())
                 {
-                    ListOfUsersFromDB = await
+                    amoutOfUsersInDB = db.Users.Count();
+
+                        ListOfUsersFromDB = await
                             (from user in db.Users
                              where
                              EF.Functions.Like(user.Date.ToString(), entranceInfo.DateOfEntrance) && //гггг-мм-дд
@@ -61,12 +62,14 @@ namespace WpfApp1.Model
                              EF.Functions.Like(user.Patronymic, person.Patronymic) &&
                              EF.Functions.Like(user.City, entranceInfo.City) &&
                              EF.Functions.Like(user.Country, entranceInfo.Country)
-                             select user).ToListAsync();
+                             select user).Skip(amountOfViewedUsers).Take(AmountOfUsersForSelection).ToListAsync();
+
+                    amountOfViewedUsers += AmountOfUsersForSelection;
                 }
             }
             catch (Exception ex)
             {
-                uIWorking.ShowMessage("Сначала загрузите файл!");
+                uiWorking.ShowMessage("Сначала загрузите файл!");
             }
             return ListOfUsersFromDB;
         }

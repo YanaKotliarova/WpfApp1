@@ -22,8 +22,8 @@ namespace WpfApp1.Model
         /// Конструктор класса User, принимающий в качестве параметра две структуры данных о пользователе,
         /// содержащий в себе дату входа, имя, фамилию, отчество, город и страну пользователя.
         /// </summary>
-        /// <param name="person"></param>
-        /// <param name="entranceInfo"></param>
+        /// <param name="person"> Структура, хранящая в себе имя, фамилию и отчество пользователя.</param>
+        /// <param name="entranceInfo"> Структура, хранящая информацию о дате входа, городе и стране пользователя.</param>
         public User(PersonStruct person, EntranceInfoStruct entranceInfo)
         {
             Date = DateOnly.Parse(entranceInfo.DateOfEntrance);

@@ -75,11 +75,18 @@ namespace WpfApp1.ViewModel
                         PersonStruct person = new PersonStruct(firstName, lastName, patronymic);
                         EntranceInfoStruct entranceInfo = new EntranceInfoStruct(date, city, country);
 
-                        user.ListOfUsersFromDB = await dataBase.GetFromDBAsync(person, entranceInfo, user.ListOfUsersFromDB);
 
-                        OutputUsersToTextbox(user.ListOfUsersFromDB);
+                        await CreateFileAsync(newFileName);
 
-                        await CreateFileAsync(newFileName);                        
+                        while (dataBase.amountOfViewedUsers <= dataBase.amoutOfUsersInDB)
+                        {
+                            user.ListOfUsersFromDB = await dataBase.GetFromDBAsync(person, entranceInfo, user.ListOfUsersFromDB);
+
+                            OutputUsersToTextbox(user.ListOfUsersFromDB);
+
+                            await AddToFileAsync(newFileName);
+                        }
+                        uiWorking.ShowMessage("Файл " + newFileName + _fileExtension + " создан!");
                     }
                     ));
             }
@@ -90,12 +97,30 @@ namespace WpfApp1.ViewModel
             if (_fileExtension.Equals(ExcelExtension))
             {
                 newFileName += ExcelExtension;
-                await excelFile.WriteIntoExcelFileAsync(newFileName, user.ListOfUsersFromDB);
+                await excelFile.CreateExcelFileAsync(newFileName);
             }
             else if (_fileExtension.Equals(XmlExtension))
             {
                 newFileName += XmlExtension;
-                await xmlFile.WriteIntoXmlFileAsync(newFileName, user.ListOfUsersFromDB);
+                await xmlFile.CreateXmlFileAsync(newFileName);
+            }
+            else
+            {
+                uiWorking.ShowMessage(_fileExtension);
+            }
+        }
+
+        private async Task AddToFileAsync(string newFileName)
+        {
+            if (_fileExtension.Equals(ExcelExtension))
+            {
+                newFileName += ExcelExtension;
+                await excelFile.AddToExcelFileAsync(newFileName, user.ListOfUsersFromDB);
+            }
+            else if (_fileExtension.Equals(XmlExtension))
+            {
+                newFileName += XmlExtension;
+                await xmlFile.AddToXmlFileAsync(newFileName, user.ListOfUsersFromDB);
             }
             else
             {

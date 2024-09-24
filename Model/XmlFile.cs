@@ -23,35 +23,51 @@ namespace WpfApp1.Model
         /// </summary>
         /// <param name="xmlFileName"> Имя создаваемого файла. </param>
         /// <returns></returns>
-        public async Task WriteIntoXmlFileAsync(string xmlFileName, List<User> ListOfUsersFromDB)
+        public async Task CreateXmlFileAsync(string xmlFileName)
+        {
+            try
+            {
+                XDocument xDoc = new XDocument();
+                XElement users = new XElement(UsersWord);
+                xDoc.Add(users);
+
+                await Task.Factory.StartNew(() => xDoc.Save(xmlFileName));
+            }
+            catch (Exception ex)
+            {
+                uIWorking.ShowMessage("Не удалось создать XML файл!" + ex.Message);
+            }
+        }
+
+        public async Task AddToXmlFileAsync(string xmlFileName, List<User> ListOfUsersFromDB)
         {
             try
             {
                 if (ListOfUsersFromDB.IsNullOrEmpty())
                     throw new Exception("Выборка не была осуществена!\r\nПроверьте введённые данные.");
 
-                XDocument xDoc = new XDocument();
-                XElement users = new XElement(UsersWord);
 
-                foreach (User user in ListOfUsersFromDB)
+                XDocument xDoc = XDocument.Load(xmlFileName);
+                XElement? root = xDoc.Element(UsersWord);
+
+                if (root != null)
                 {
-                    XElement newUser = new XElement(UserWord + user.Id.ToString());
-                    XElement newUserDate = new XElement(DateWord, user.Date);
-                    XElement newUserFirstName = new XElement(FirstNameWord, user.FirstName);
-                    XElement newUserLastName = new XElement(LastNameWord, user.LastName);
-                    XElement newUserPatronymic = new XElement(PatronymicWord, user.Patronymic);
-                    XElement newUserCity = new XElement(CityWord, user.City);
-                    XElement newUserCountry = new XElement(CountryWord, user.Country);
+                    foreach (User user in ListOfUsersFromDB)
+                    {
+                        XElement newUser = new XElement(UserWord + user.Id.ToString());
+                        XElement newUserDate = new XElement(DateWord, user.Date);
+                        XElement newUserFirstName = new XElement(FirstNameWord, user.FirstName);
+                        XElement newUserLastName = new XElement(LastNameWord, user.LastName);
+                        XElement newUserPatronymic = new XElement(PatronymicWord, user.Patronymic);
+                        XElement newUserCity = new XElement(CityWord, user.City);
+                        XElement newUserCountry = new XElement(CountryWord, user.Country);
 
-                    newUser.Add(newUserDate, newUserFirstName, newUserLastName, newUserPatronymic, newUserCity, newUserCountry);
-                    users.Add(newUser);
+                        newUser.Add(newUserDate, newUserFirstName, newUserLastName, newUserPatronymic, newUserCity, newUserCountry);
+                        root.Add(newUser);
+                    }
+                    await Task.Factory.StartNew(() => xDoc.Save(xmlFileName));
+                    ListOfUsersFromDB.Clear();
                 }
-                xDoc.Add(users);
-
-                await Task.Factory.StartNew(() => xDoc.Save(xmlFileName));
-
-                uIWorking.ShowMessage("XML файл " + xmlFileName + " создан");
-                ListOfUsersFromDB.Clear();
             }
             catch (Exception ex)
             {
