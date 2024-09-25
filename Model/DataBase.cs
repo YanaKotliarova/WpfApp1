@@ -25,17 +25,25 @@ namespace WpfApp1.Model
         /// <returns></returns>
         public async Task AddToDBAsync(List<User> ListOfUsersFromFile)
         {
-            using (ApplicationContext db = new ApplicationContext())
+            try
             {
-                //await db.Database.EnsureDeletedAsync();
-                await db.Database.EnsureCreatedAsync();
+                using (ApplicationContext db = new ApplicationContext())
+                {
+                    await db.Database.EnsureDeletedAsync();
+                    //await db.Database.EnsureCreatedAsync();
+                    await db.Database.MigrateAsync();
 
-                foreach (User user in ListOfUsersFromFile)
-                    await db.Users.AddAsync(user);
+                    foreach (User user in ListOfUsersFromFile)
+                        await db.Users.AddAsync(user);
 
-                await db.SaveChangesAsync();
+                    await db.SaveChangesAsync();
 
-                ListOfUsersFromFile.Clear();
+                    ListOfUsersFromFile.Clear();
+                }
+            }
+            catch (Exception ex)
+            {
+                uiWorking.ShowMessage(ex.Message);
             }
         }
 
@@ -69,7 +77,8 @@ namespace WpfApp1.Model
             }
             catch (Exception ex)
             {
-                uiWorking.ShowMessage("Сначала загрузите файл!");
+                uiWorking.ShowMessage(ex.Message);
+                amountOfViewedUsers = -1;
             }
             return ListOfUsersFromDB;
         }

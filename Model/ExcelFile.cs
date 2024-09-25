@@ -83,7 +83,7 @@ namespace WpfApp1.Model
             }
             catch (Exception ex)
             {
-                uiWorking.ShowMessage(ex.Message);
+                //uiWorking.ShowMessage(ex.Message);                
             }
         }
 

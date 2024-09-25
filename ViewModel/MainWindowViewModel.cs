@@ -1,5 +1,4 @@
 ﻿using Microsoft.IdentityModel.Tokens;
-using System;
 using WpfApp1.Model;
 using WpfApp1.MVVM;
 using WpfApp1.View;
@@ -80,13 +79,17 @@ namespace WpfApp1.ViewModel
 
                         while (dataBase.amountOfViewedUsers <= dataBase.amoutOfUsersInDB)
                         {
+                            if (dataBase.amountOfViewedUsers < 0) break;
+
                             user.ListOfUsersFromDB = await dataBase.GetFromDBAsync(person, entranceInfo, user.ListOfUsersFromDB);
-
-                            OutputUsersToTextbox(user.ListOfUsersFromDB);
-
+                            user.ListOfUsersFromFile.AddRange(user.ListOfUsersFromDB);
                             await AddToFileAsync(newFileName);
                         }
-                        uiWorking.ShowMessage("Файл " + newFileName + _fileExtension + " создан!");
+
+                        OutputUsersToTextbox(user.ListOfUsersFromFile);
+
+                        if (!(dataBase.amountOfViewedUsers < 0)) uiWorking.ShowMessage("Файл " + newFileName + _fileExtension + " создан!");
+                        dataBase.amountOfViewedUsers = 0;
                     }
                     ));
             }
@@ -107,6 +110,7 @@ namespace WpfApp1.ViewModel
             else
             {
                 uiWorking.ShowMessage(_fileExtension);
+                dataBase.amountOfViewedUsers = -1;
             }
         }
 
@@ -121,10 +125,6 @@ namespace WpfApp1.ViewModel
             {
                 newFileName += XmlExtension;
                 await xmlFile.AddToXmlFileAsync(newFileName, user.ListOfUsersFromDB);
-            }
-            else
-            {
-                uiWorking.ShowMessage(_fileExtension);
             }
         }
 
@@ -145,12 +145,13 @@ namespace WpfApp1.ViewModel
             }
         }
 
-        internal void OutputUsersToTextbox(List<User> ListOfUsersFromDB)
+        internal void OutputUsersToTextbox(List<User> ListOfUsersFromFile)
         {
             MainText = "Созданная выборка:\r\n";
-            foreach (User u in ListOfUsersFromDB)
+            foreach (User u in ListOfUsersFromFile)
                 MainText += u.Date.ToString() + Space + u.FirstName + Space + u.LastName + Space
                         + u.Patronymic + Space + u.City + Space + u.Country + "\r\n";
+            ListOfUsersFromFile.Clear();
         }
 
         private DateTime? _datePicker;

@@ -71,7 +71,7 @@ namespace WpfApp1.Model
             }
             catch (Exception ex)
             {
-                uIWorking.ShowMessage("Не удалось создать XML файл!" + ex.Message);
+                //uIWorking.ShowMessage("Не удалось создать XML файл!" + ex.Message);
             }
         }
     }

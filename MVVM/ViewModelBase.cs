@@ -11,9 +11,5 @@ namespace WpfApp1.MVVM
             if (PropertyChanged != null)
                 PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
         }
-        //public void SetProperty()
-        //{
-
-        //}
     }
 }
