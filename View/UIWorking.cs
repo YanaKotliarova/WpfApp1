@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using Microsoft.Win32;
+using System.Windows;
 
 namespace WpfApp1.View
 {
@@ -13,9 +14,7 @@ namespace WpfApp1.View
 
         public bool OpenFileDialog(out string fileName)
         {
-
-
-            var openFileDialog = new Microsoft.Win32.OpenFileDialog();
+            var openFileDialog = new OpenFileDialog();
 
             openFileDialog.Filter = FileExtensionFilter;
             openFileDialog.Multiselect = false;

@@ -65,7 +65,7 @@ namespace WpfApp1.ViewModel
                             newFileName = FileNameTextBox;
 
                         string date = dataBase.FormateDate(DatePicker);
-                        string firstName = dataBase.FormateStringData(FirstNameTextBox);            
+                        string firstName = dataBase.FormateStringData(FirstNameTextBox);
                         string lastName = dataBase.FormateStringData(LastNameTextBox);
                         string patronymic = dataBase.FormateStringData(PatronymicTextBox);
                         string city = dataBase.FormateStringData(CityTextBox);
@@ -90,6 +90,23 @@ namespace WpfApp1.ViewModel
 
                         if (!(dataBase.amountOfViewedUsers < 0)) uiWorking.ShowMessage("Файл " + newFileName + _fileExtension + " создан!");
                         dataBase.amountOfViewedUsers = 0;
+                    }
+                    ));
+            }
+        }
+
+        private RelayCommand _selectFileFormat;
+        public RelayCommand SelectFileFormat
+        {
+            get
+            {
+                return _selectFileFormat ??
+                    (_selectFileFormat = new RelayCommand(obj =>
+                    {
+                        if (obj.Equals(ExcelExtension))
+                            _fileExtension = ExcelExtension;
+                        else if (obj.Equals(XmlExtension))
+                            _fileExtension = XmlExtension;
                     }
                     ));
             }
@@ -128,23 +145,6 @@ namespace WpfApp1.ViewModel
             }
         }
 
-        private RelayCommand _selectFileFormat;
-        public RelayCommand SelectFileFormat
-        {
-            get
-            {
-                return _selectFileFormat ??
-                    (_selectFileFormat = new RelayCommand(obj =>
-                    {
-                        if (obj.Equals(ExcelExtension))
-                            _fileExtension = ExcelExtension;
-                        else if (obj.Equals(XmlExtension))
-                            _fileExtension = XmlExtension;
-                    }
-                    ));
-            }
-        }
-
         internal void OutputUsersToTextbox(List<User> ListOfUsersFromFile)
         {
             MainText = "Созданная выборка:\r\n";
@@ -152,6 +152,12 @@ namespace WpfApp1.ViewModel
                 MainText += u.Date.ToString() + Space + u.FirstName + Space + u.LastName + Space
                         + u.Patronymic + Space + u.City + Space + u.Country + "\r\n";
             ListOfUsersFromFile.Clear();
+        }
+
+        private void TextBoxDataValidating(string? textBoxData)
+        {
+            if ((!string.IsNullOrEmpty(textBoxData)) && (!textBoxData.All(Char.IsLetter)))
+                throw new Exception("Возможен только буквенный ввод!");
         }
 
         private DateTime? _datePicker;
@@ -177,13 +183,23 @@ namespace WpfApp1.ViewModel
         }
 
         private string _firstNameTextBox;
+
         public string FirstNameTextBox
         {
             get { return _firstNameTextBox; }
             set
             {
-                _firstNameTextBox = value;
-                OnPropertyChanged(nameof(FirstNameTextBox));
+                try
+                {
+                    TextBoxDataValidating(value);
+
+                    _firstNameTextBox = value;
+                    OnPropertyChanged(nameof(FirstNameTextBox));
+                }
+                catch (Exception ex)
+                { 
+                    uiWorking.ShowMessage(ex.Message);
+                }
             }
         }
 
@@ -193,8 +209,17 @@ namespace WpfApp1.ViewModel
             get { return _lastNameTextBox; }
             set
             {
-                _lastNameTextBox = value;
-                OnPropertyChanged(nameof(LastNameTextBox));
+                try
+                {
+                    TextBoxDataValidating(value);
+
+                    _lastNameTextBox = value;
+                    OnPropertyChanged(nameof(LastNameTextBox));
+                }
+                catch (Exception ex)
+                {
+                    uiWorking.ShowMessage(ex.Message);
+                }
             }
         }
 
@@ -204,8 +229,17 @@ namespace WpfApp1.ViewModel
             get { return _patronymicTextBox; }
             set
             {
-                _patronymicTextBox = value;
-                OnPropertyChanged(nameof(PatronymicTextBox));
+                try
+                {
+                    TextBoxDataValidating(value);
+
+                    _patronymicTextBox = value;
+                    OnPropertyChanged(nameof(PatronymicTextBox));
+                }
+                catch (Exception ex)
+                {
+                    uiWorking.ShowMessage(ex.Message);
+                }
             }
         }
 
@@ -215,8 +249,17 @@ namespace WpfApp1.ViewModel
             get { return _cityTextBox; }
             set
             {
-                _cityTextBox = value;
-                OnPropertyChanged(nameof(CityTextBox));
+                try
+                {
+                    TextBoxDataValidating(value);
+
+                    _cityTextBox = value;
+                    OnPropertyChanged(nameof(CityTextBox));
+                }
+                catch (Exception ex)
+                {
+                    uiWorking.ShowMessage(ex.Message);
+                }
             }
         }
 
@@ -226,8 +269,17 @@ namespace WpfApp1.ViewModel
             get { return _countryTextBox; }
             set
             {
-                _countryTextBox = value;
-                OnPropertyChanged(nameof(CountryTextBox));
+                try
+                {
+                    TextBoxDataValidating(value);
+
+                    _countryTextBox = value;
+                    OnPropertyChanged(nameof(CountryTextBox));
+                }
+                catch (Exception ex)
+                {
+                    uiWorking.ShowMessage(ex.Message);
+                }
             }
         }
     }

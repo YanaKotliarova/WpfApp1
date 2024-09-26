@@ -10,8 +10,7 @@ namespace WpfApp1.Model
         internal DbSet<User> Users { get; set; } = null!;
         public string connectionString = @"Server=localhost;Database=Users;Trusted_Connection=True;TrustServerCertificate=true;";
         //public string connectionString = @"blablabla";
-
-        protected bool ValidateConnectionString()
+        internal bool ValidateConnectionString()
         {
             try
             {
@@ -30,9 +29,10 @@ namespace WpfApp1.Model
                 return true;
             }
         }
+
         public ApplicationContext()
         {
-            if (!ValidateConnectionString()) throw new Exception("Не валидатная строка подключения к БД.");
+            //if (!ValidateConnectionString()) throw new Exception("Не валидатная строка подключения к БД.");
             //Database.Migrate();
         }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)

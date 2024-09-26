@@ -19,6 +19,16 @@ namespace WpfApp1.Model
         UIWorking uiWorking = new UIWorking();
 
 
+        public async Task<ApplicationContext> InitializeDBAsync(ApplicationContext db)
+        {
+            if (!db.ValidateConnectionString()) 
+                throw new Exception("Не валидатная строка подключения к БД.");
+
+            await db.Database.MigrateAsync();
+
+            return db;
+        }
+
         /// <summary>
         /// Асинхронный метод записи данных в БД.
         /// </summary>
@@ -27,11 +37,12 @@ namespace WpfApp1.Model
         {
             try
             {
-                using (ApplicationContext db = new ApplicationContext())
+                using (ApplicationContext db = await InitializeDBAsync(new ApplicationContext()))
+                //using (ApplicationContext db = new ApplicationContext())
                 {
-                    await db.Database.EnsureDeletedAsync();
+                    //await db.Database.EnsureDeletedAsync();
                     //await db.Database.EnsureCreatedAsync();
-                    await db.Database.MigrateAsync();
+                    //await db.Database.MigrateAsync();
 
                     foreach (User user in ListOfUsersFromFile)
                         await db.Users.AddAsync(user);
@@ -57,7 +68,8 @@ namespace WpfApp1.Model
         {
             try
             {
-                using (ApplicationContext db = new ApplicationContext())
+                using (ApplicationContext db = await InitializeDBAsync(new ApplicationContext()))
+                //using (ApplicationContext db = new ApplicationContext())
                 {
                     amoutOfUsersInDB = db.Users.Count();
 
