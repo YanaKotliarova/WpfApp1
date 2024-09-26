@@ -19,7 +19,7 @@ namespace WpfApp1.Model
         UIWorking uiWorking = new UIWorking();
 
         /// <summary>
-        /// Асинхронный метод записи выборки из БД в Excel файл.
+        /// Асинхронный метод создания Excel файла.
         /// </summary>
         /// <param name="excelFileName"> Имя создаваемого файла. </param>
         /// <returns></returns>
@@ -49,6 +49,12 @@ namespace WpfApp1.Model
             }
         }
 
+        /// <summary>
+        /// Асинхронный метод дозаписи данных, полученных из БД в Excel файл.
+        /// </summary>
+        /// <param name="excelFileName"> Имя Excel файла.</param>
+        /// <param name="ListOfUsersFromDB"> Список пользователей для записи в файл. </param>
+        /// <returns></returns>
         public async Task AddToExcelFileAsync(string excelFileName, List<User> ListOfUsersFromDB)
         {
             try

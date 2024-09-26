@@ -22,6 +22,9 @@ namespace WpfApp1.ViewModel
         private string _fileExtension = "Выберите формат файла!";
 
         private string _mainTextBoxText = "Выберите, пожалуйста, файл!\t\t\t\t\t\t\t--------->\r\n(в формате csv)";
+        /// <summary>
+        /// Свойство, связанное с главным текстовым полем, используемым для вывода информации.
+        /// </summary>
         public string MainText
         {
             get { return _mainTextBoxText; }
@@ -33,6 +36,10 @@ namespace WpfApp1.ViewModel
         }
 
         private RelayCommand _readCsvFileCommandAndAddToBD;
+        /// <summary>
+        /// Команда, связанная с кнопкой открытия csv файла. 
+        /// При открытии файла данные из него считываются и записываются в БД.
+        /// </summary>
         public RelayCommand ReadCsvFileCommandAndAddToBD
         {
             get
@@ -53,6 +60,12 @@ namespace WpfApp1.ViewModel
         }
 
         private RelayCommand _exportIntoFile;
+        /// <summary>
+        /// Команда, связанная с кнопкой экспорта данных, которая собирает введённые данные из текстовых полей,
+        /// создаёт структуры с данными о пользователях, которых нужно искать в БД, после чего создаёт файл нужного формата и
+        /// запускает постепенные выборку из БД и запись пользователей в этот файл. После создания файла созданная выборка 
+        /// выводится в главное текстовое поле.
+        /// </summary>
         public RelayCommand ExportIntoFile
         {
             get
@@ -96,6 +109,9 @@ namespace WpfApp1.ViewModel
         }
 
         private RelayCommand _selectFileFormat;
+        /// <summary>
+        /// Команда, связанная с двумя кнопками типа RadioButton, для выбора формата сохраняемого файла.
+        /// </summary>
         public RelayCommand SelectFileFormat
         {
             get
@@ -112,6 +128,11 @@ namespace WpfApp1.ViewModel
             }
         }
 
+        /// <summary>
+        /// Асинхронный метод создания файла нужного формата.
+        /// </summary>
+        /// <param name="newFileName"></param>
+        /// <returns></returns>
         private async Task CreateFileAsync(string newFileName)
         {
             if (_fileExtension.Equals(ExcelExtension))
@@ -131,6 +152,11 @@ namespace WpfApp1.ViewModel
             }
         }
 
+        /// <summary>
+        /// Асинхронный метод добавления данных выборки в файл.
+        /// </summary>
+        /// <param name="newFileName"></param>
+        /// <returns></returns>
         private async Task AddToFileAsync(string newFileName)
         {
             if (_fileExtension.Equals(ExcelExtension))
@@ -145,6 +171,10 @@ namespace WpfApp1.ViewModel
             }
         }
 
+        /// <summary>
+        /// Метод вывода созданной выборки в главное текстовое поле.
+        /// </summary>
+        /// <param name="ListOfUsersFromFile"></param>
         internal void OutputUsersToTextbox(List<User> ListOfUsersFromFile)
         {
             MainText = "Созданная выборка:\r\n";
@@ -154,6 +184,11 @@ namespace WpfApp1.ViewModel
             ListOfUsersFromFile.Clear();
         }
 
+        /// <summary>
+        /// Метод валидации текстовых полей, допускающий ввод только букв.
+        /// </summary>
+        /// <param name="textBoxData"></param>
+        /// <exception cref="Exception"></exception>
         private void TextBoxDataValidating(string? textBoxData)
         {
             if ((!string.IsNullOrEmpty(textBoxData)) && (!textBoxData.All(Char.IsLetter)))
@@ -161,6 +196,9 @@ namespace WpfApp1.ViewModel
         }
 
         private DateTime? _datePicker;
+        /// <summary>
+        /// Свойство, связанное с объектом DatePicker для ввода даты для создания выборки из БД.
+        /// </summary>
         public DateTime? DatePicker
         {
             get { return _datePicker; }
@@ -172,6 +210,9 @@ namespace WpfApp1.ViewModel
         }
 
         private string _fileNameTextBox;
+        /// <summary>
+        /// Свойство, связанное с текстовым полем для ввода имени файла для сохранения выборки из БД.
+        /// </summary>
         public string FileNameTextBox
         {
             get { return _fileNameTextBox; }
@@ -183,7 +224,9 @@ namespace WpfApp1.ViewModel
         }
 
         private string _firstNameTextBox;
-
+        /// <summary>
+        /// Свойство, связанное с текстовым полем для ввода имени для создания выборки из БД.
+        /// </summary>
         public string FirstNameTextBox
         {
             get { return _firstNameTextBox; }
@@ -204,6 +247,9 @@ namespace WpfApp1.ViewModel
         }
 
         private string _lastNameTextBox;
+        /// <summary>
+        /// Свойство, связанное с текстовым полем для ввода фамилии для создания выборки из БД.
+        /// </summary>
         public string LastNameTextBox
         {
             get { return _lastNameTextBox; }
@@ -224,6 +270,9 @@ namespace WpfApp1.ViewModel
         }
 
         private string _patronymicTextBox;
+        /// <summary>
+        /// Свойство, связанное с текстовым полем для ввода отчества для создания выборки из БД.
+        /// </summary>
         public string PatronymicTextBox
         {
             get { return _patronymicTextBox; }
@@ -244,6 +293,9 @@ namespace WpfApp1.ViewModel
         }
 
         private string _cityTextBox;
+        /// <summary>
+        /// Свойство, связанное с текстовым полем для ввода города для создания выборки из БД.
+        /// </summary>
         public string CityTextBox
         {
             get { return _cityTextBox; }
@@ -264,6 +316,9 @@ namespace WpfApp1.ViewModel
         }
 
         private string _countryTextBox;
+        /// <summary>
+        /// Свойство, связанное с текстовым полем для ввода страны для создания выборки из БД.
+        /// </summary>
         public string CountryTextBox
         {
             get { return _countryTextBox; }

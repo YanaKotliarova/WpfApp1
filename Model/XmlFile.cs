@@ -19,7 +19,7 @@ namespace WpfApp1.Model
         UIWorking uIWorking = new UIWorking();
 
         /// <summary>
-        /// Асинхронный метод записи выборки из БД в Xml файл.
+        /// Асинхронный метод создания Xml файла.
         /// </summary>
         /// <param name="xmlFileName"> Имя создаваемого файла. </param>
         /// <returns></returns>
@@ -39,6 +39,12 @@ namespace WpfApp1.Model
             }
         }
 
+        /// <summary>
+        /// Асинхронный метод дозаписи полученных из БД данный в созданный Xml файл.
+        /// </summary>
+        /// <param name="xmlFileName"> Имя Xml файла. </param>
+        /// <param name="ListOfUsersFromDB"> Список пользователей для записи. </param>
+        /// <returns></returns>
         public async Task AddToXmlFileAsync(string xmlFileName, List<User> ListOfUsersFromDB)
         {
             try

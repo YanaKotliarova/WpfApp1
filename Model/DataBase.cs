@@ -18,7 +18,12 @@ namespace WpfApp1.Model
 
         UIWorking uiWorking = new UIWorking();
 
-
+        /// <summary>
+        /// Асинхронный метод инициализации БД с помощью миграции.
+        /// </summary>
+        /// <param name="db"> Объект класса ApplicationContext, для вызова методов этого класса.</param>
+        /// <returns></returns>
+        /// <exception cref="Exception"></exception>
         public async Task<ApplicationContext> InitializeDBAsync(ApplicationContext db)
         {
             if (!db.ValidateConnectionString()) 
@@ -108,6 +113,11 @@ namespace WpfApp1.Model
             return date;
         }
 
+        /// <summary>
+        /// Метод преобразования пустой строки для поиска в БД.
+        /// </summary>
+        /// <param name="data"> Строка для преобразования. </param>
+        /// <returns></returns>
         public string FormateStringData(string data)
         {
             if (data.IsNullOrEmpty()) data = Percent;

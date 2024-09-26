@@ -7,11 +7,20 @@ namespace WpfApp1.View
     {
         private const string FileExtensionFilter = "Text files (*.csv) | *.csv";
 
+        /// <summary>
+        /// Метод показа окон с сообщениями.
+        /// </summary>
+        /// <param name="message"></param>
         internal void ShowMessage(string message)
         {
             MessageBox.Show(message);
         }
 
+        /// <summary>
+        /// Метод для открытия диалога выбора файлов.
+        /// </summary>
+        /// <param name="fileName"> Имя выбранного для открытия файла. </param>
+        /// <returns></returns>
         public bool OpenFileDialog(out string fileName)
         {
             var openFileDialog = new OpenFileDialog();
