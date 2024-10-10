@@ -8,8 +8,9 @@ namespace WpfApp1.MVVM
         public event PropertyChangedEventHandler? PropertyChanged;
 
         /// <summary>
-        /// Метод учитывания изменения визуального компонента приложения.
-        /// В основном используется для текстовых полей.
+        /// A method for taking into account changes 
+        /// in the visual component of the application. 
+        /// It is mainly used for text fields.
         /// </summary>
         /// <param name="propertyName"> Имя компонента. </param>
         public void OnPropertyChanged([CallerMemberName] string propertyName = "")

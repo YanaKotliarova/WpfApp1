@@ -1,25 +1,16 @@
 ﻿using Microsoft.Win32;
-using System.Windows;
+using WpfApp1.View.UI.Interfaces;
 
-namespace WpfApp1.View
+namespace WpfApp1.View.UI
 {
-    internal class UIWorking
+    internal class FileDialog: IFileDialog
     {
         private const string FileExtensionFilter = "Text files (*.csv) | *.csv";
 
         /// <summary>
-        /// Метод показа окон с сообщениями.
+        /// The method for opening the file selection dialog.
         /// </summary>
-        /// <param name="message"></param>
-        internal void ShowMessage(string message)
-        {
-            MessageBox.Show(message);
-        }
-
-        /// <summary>
-        /// Метод для открытия диалога выбора файлов.
-        /// </summary>
-        /// <param name="fileName"> Имя выбранного для открытия файла. </param>
+        /// <param name="fileName"> Name of chosen file. </param>
         /// <returns></returns>
         public bool OpenFileDialog(out string fileName)
         {
@@ -36,8 +27,8 @@ namespace WpfApp1.View
             }
             else
             {
-                fileName = "Ошибка открытия файла";
-                ShowMessage(fileName);
+                fileName = "";
+                throw new Exception("Ошибка открытия файла");
             }
             return (bool)result;
         }

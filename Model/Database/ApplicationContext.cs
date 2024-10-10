@@ -1,29 +1,31 @@
 ﻿using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using System.IO;
+using WpfApp1.Model.MainModel;
 
-namespace WpfApp1.Model
+namespace WpfApp1.Model.Database
 {
     internal class ApplicationContext : DbContext
     {
+        private const string DefaultConnectionString = "DefaultConnection";
+        private const string ConfigurationFile = "connectionConfiguration.json";
         internal DbSet<User> Users { get; set; } = null!;
-        public string connectionString = @"Server=localhost;Database=Users;Trusted_Connection=True;TrustServerCertificate=true;";
-        //public string connectionString = @"blablabla";
 
-        public ApplicationContext()
-        {
-            //if (!ValidateConnectionString()) throw new Exception("Не валидатная строка подключения к БД.");
-            //Database.Migrate();
-        }
+        IConfigurationRoot configuration = new ConfigurationBuilder()
+                                .AddJsonFile(ConfigurationFile)
+                                .SetBasePath(Directory.GetCurrentDirectory())
+                                .Build();
 
         /// <summary>
-        /// Метод проверки валидности строки подключения к БД.
+        /// A method for verifying the validity of the DB connection string.
         /// </summary>
         /// <returns></returns>
         internal bool ValidateConnectionString()
         {
             try
             {
-                using (var con = new SqlConnection(connectionString))
+                using (var con = new SqlConnection(configuration.GetConnectionString(DefaultConnectionString)))
                 {
                     con.Open();
                 }
@@ -40,12 +42,13 @@ namespace WpfApp1.Model
         }
 
         /// <summary>
-        /// Метод подключения к БД.
+        /// The method of connecting to the DB.
         /// </summary>
         /// <param name="optionsBuilder"></param>
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlServer(connectionString);
+            optionsBuilder.UseSqlServer(configuration.GetConnectionString(DefaultConnectionString));
         }
+
     }
 }

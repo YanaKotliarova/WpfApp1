@@ -1,11 +1,8 @@
 ﻿using System.Windows;
-using WpfApp1.ViewModel;
+using WpfApp1.ViewModel.ViewModels;
 
 namespace WpfApp1
 {
-    /// <summary>
-    /// Interaction logic for MainWindow.xaml
-    /// </summary>
     public partial class MainWindow : Window
     {
         public MainWindow()
