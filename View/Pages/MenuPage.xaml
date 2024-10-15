@@ -21,5 +21,8 @@
                             Command="{Binding OpenPageCommand}" CommandParameter="{Binding ElementName=ViewButton}"
                             ImageSource="/View/Images/View.png" NavigationUri="/View/Pages/ViewingPage.xaml" Margin="154,2,2,2"/>
 
+
     </Grid>
+    
+    
 </Page>

@@ -1,53 +1,27 @@
-﻿using Microsoft.Data.SqlClient;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using System.IO;
+﻿using Microsoft.EntityFrameworkCore;
+using System.Configuration;
 using WpfApp1.Model.MainModel;
 
 namespace WpfApp1.Model.Database
 {
     internal class ApplicationContext : DbContext
     {
-        private const string DefaultConnectionString = "DefaultConnection";
-        private const string ConfigurationFile = "connectionConfiguration.json";
+        private const string DefaultConnection = "DefaultConnection";
         internal DbSet<User> Users { get; set; } = null!;
 
-        IConfigurationRoot configuration = new ConfigurationBuilder()
-                                .AddJsonFile(ConfigurationFile)
-                                .SetBasePath(Directory.GetCurrentDirectory())
-                                .Build();
+        string connectionString = ConfigurationManager.ConnectionStrings[DefaultConnection].ConnectionString;
 
-        /// <summary>
-        /// A method for verifying the validity of the DB connection string.
-        /// </summary>
-        /// <returns></returns>
-        internal bool ValidateConnectionString()
+        internal string ReturnConnectionString()
         {
-            try
-            {
-                using (var con = new SqlConnection(configuration.GetConnectionString(DefaultConnectionString)))
-                {
-                    con.Open();
-                }
-                return true;
-            }
-            catch (ArgumentException)
-            {
-                return false;
-            }
-            catch (SqlException)
-            {
-                return true;
-            }
+            return connectionString;
         }
-
         /// <summary>
         /// The method of connecting to the DB.
         /// </summary>
         /// <param name="optionsBuilder"></param>
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlServer(configuration.GetConnectionString(DefaultConnectionString));
+            optionsBuilder.UseSqlServer(connectionString);
         }
 
     }

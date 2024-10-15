@@ -14,24 +14,24 @@ namespace WpfApp1.Model.MainModel
         public string City { get; set; }
         public string Country { get; set; }
 
-        internal List<User> ListOfUsersFromFile = new List<User>();
-        internal List<User> ListOfUsersFromDB = new List<User>();
+        internal List<User> listOfUsersFromFile = new List<User>();
+        internal List<User> listOfUsersFromDB = new List<User>();
 
-        public List<User> returnListOfUsersFromFile()
+        public List<User> ReturnListOfUsersFromFile()
         {
-            return ListOfUsersFromFile;
+            return listOfUsersFromFile;
         }
-        public List<User> returnListOfUsersFromDB()
+        public List<User> ReturnListOfUsersFromDB()
         {
-            return ListOfUsersFromDB;
+            return listOfUsersFromDB;
         }
-        public void setListOfUsersFromFile(List<User> ListOfUsersFromFile)
+        public void SetListOfUsersFromFile(List<User> listOfUsersFromFile)
         {
-            this.ListOfUsersFromFile = ListOfUsersFromFile;
+            this.listOfUsersFromFile = listOfUsersFromFile;
         }
-        public void setListOfUsersFromDB(List<User> ListOfUsersFromDB)
+        public void SetListOfUsersFromDB(List<User> listOfUsersFromDB)
         {
-            this.ListOfUsersFromDB = ListOfUsersFromDB;
+            this.listOfUsersFromDB = listOfUsersFromDB;
         }
         public User() { }
 

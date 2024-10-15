@@ -11,8 +11,7 @@ namespace WpfApp1.ViewModel.ViewModels
     {
         private const string Space = " ";
 
-
-        private string _viewTextBoxText = "Нажмите кнопку, чтобы увидеть созданную выборку!";
+        private string _viewTextBoxText;
         /// <summary>
         /// A property associated with the text field used to display information.
         /// </summary>
@@ -37,8 +36,8 @@ namespace WpfApp1.ViewModel.ViewModels
                 return _showSelectionCommand ??
                     (_showSelectionCommand = new RelayCommand(obj =>
                     {
-                        var user = App.serviceProvider.GetService<IAbstractFactory<IUser>>()!.Create();
-                        OutputUsersToTextbox(user.returnListOfUsersFromFile());
+                        var user = MainWindowViewModel.serviceProvider.GetService<IAbstractFactory<IUser>>()!.Create();
+                        OutputUsersToTextbox(user.ReturnListOfUsersFromFile());
                     }
                     ));
             }

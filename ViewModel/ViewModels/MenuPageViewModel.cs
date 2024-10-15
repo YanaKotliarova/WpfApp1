@@ -8,6 +8,7 @@ namespace WpfApp1.ViewModel.ViewModels
 {
     class MenuPageViewModel : ViewModelBase
     {
+
         private RelayCommand _openPageCommand;
         /// <summary>
         /// The command associated with created navigation buttons to open program pages.
@@ -19,7 +20,7 @@ namespace WpfApp1.ViewModel.ViewModels
                 return _openPageCommand ??
                     (_openPageCommand = new RelayCommand(obj =>
                     {
-                        var message = App.serviceProvider.GetService<IAbstractFactory<IMessage>>()!.Create();
+                        var message = MainWindowViewModel.serviceProvider.GetService<IAbstractFactory<IMessage>>()!.Create();
                         try
                         {
                             NavigationButton ClickedButton = obj as NavigationButton;
@@ -37,5 +38,7 @@ namespace WpfApp1.ViewModel.ViewModels
                     ));
             }
         }
+
+
     }
 }

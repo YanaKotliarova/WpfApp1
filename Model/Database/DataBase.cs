@@ -1,6 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using WpfApp1.Model.Database.Interfaces;
 using WpfApp1.Model.MainModel;
+using WpfApp1.ViewModel.Factories.Interfaces;
+using WpfApp1.ViewModel.ViewModels;
 
 namespace WpfApp1.Model.Database
 {
@@ -16,7 +19,6 @@ namespace WpfApp1.Model.Database
         public DataBase()
         {
             db = new ApplicationContext();
-            InitializeDB();
         }
 
         /// <summary>
@@ -25,13 +27,14 @@ namespace WpfApp1.Model.Database
         /// <param name="db"> An object of the ApplicationContext class, for calling methods of this class.</param>
         /// <returns></returns>
         /// <exception cref="Exception"></exception>
-
-        public void InitializeDB()
+        public async Task InitializeDBAsync()
         {
-            if (!db.ValidateConnectionString())
+            var validateString = MainWindowViewModel.serviceProvider.GetService<IAbstractFactory<IConnectionStringValidation>>()!.Create();
+
+            if (!validateString.ValidateConnectionString(db.ReturnConnectionString()))
                 throw new Exception("Не валидатная строка подключения к БД.");
 
-            db.Database.Migrate();
+            await db.Database.MigrateAsync();
         }
 
         /// <summary>
@@ -52,9 +55,9 @@ namespace WpfApp1.Model.Database
         /// The method for returning amount of users in DB.
         /// </summary>
         /// <returns></returns>
-        public int ReturnAmountOfUsersInDB()
+        public async Task<int> ReturnAmountOfUsersInDBAsync()
         {
-            amoutOfUsersInDB = db.Users.Count();
+            amoutOfUsersInDB = await db.Users.CountAsync();
             return amoutOfUsersInDB;
         }
 

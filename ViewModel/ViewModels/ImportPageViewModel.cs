@@ -11,7 +11,6 @@ namespace WpfApp1.ViewModel.ViewModels
 {
     class ImportPageViewModel : ViewModelBase
     {
-
         private string _importTextBoxText = "Выберите, пожалуйста, файл!\t\t\t\t\t\t\t--------->\r\n(в формате csv)";
         /// <summary>
         /// A property associated with the text field used to display information.
@@ -38,21 +37,22 @@ namespace WpfApp1.ViewModel.ViewModels
                 return _readCsvFileAndAddToBDCommand ??
                     (_readCsvFileAndAddToBDCommand = new RelayCommand(async obj =>
                     {
-                        var message = App.serviceProvider.GetService<IAbstractFactory<IMessage>>()!.Create();
+
+                        var message = MainWindowViewModel.serviceProvider.GetService<IAbstractFactory<IMessage>>()!.Create();
                         try
                         {
-                            var fileDialog = App.serviceProvider.GetService<IAbstractFactory<IFileDialog>>()!.Create();
-                            var user = App.serviceProvider.GetService<IAbstractFactory<IUser>>()!.Create();
+                            var fileDialog = MainWindowViewModel.serviceProvider.GetService<IAbstractFactory<IFileDialog>>()!.Create();
+                            var user = MainWindowViewModel.serviceProvider.GetService<IAbstractFactory<IUser>>()!.Create();
 
                             if (fileDialog.OpenFileDialog(out string fileName))
                             {
-                                var db = App.serviceProvider.GetService<IAbstractFactory<IRepository<User>>>()!.Create();
+                                var db = MainWindowViewModel.serviceProvider.GetService<IAbstractFactory<IRepository<User>>>()!.Create();
 
-                                var fileImporter = App.serviceProvider.GetService<IAbstractFactory<IDataImporter>>()!.Create();
+                                var fileImporter = MainWindowViewModel.serviceProvider.GetService<IAbstractFactory<IDataImporter>>()!.Create();
                                 ImportText = "Открытие файла и перенос данных могут занять некоторое время...";
-                                await fileImporter.ReadFromFileAsync(fileName, user.returnListOfUsersFromFile());
+                                await fileImporter.ReadFromFileAsync(fileName, user.ReturnListOfUsersFromFile());
 
-                                await db.AddToDBAsync(user.returnListOfUsersFromFile());
+                                await db.AddToDBAsync(user.ReturnListOfUsersFromFile());
 
                                 ImportText = "Данные загружены в базу даных и готовы к экспорту.";
                             }
@@ -61,6 +61,7 @@ namespace WpfApp1.ViewModel.ViewModels
                         {
                             message.ShowMessage(ex.Message);
                         }
+
                     }
                     ));
             }

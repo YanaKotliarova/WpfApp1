@@ -4,13 +4,22 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WpfApp1" 
-        xmlns:viewmodel="clr-namespace:WpfApp1.ViewModel"
+        
+        xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
+      
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800"
         WindowStartupLocation="CenterScreen">
-        
+
 
     <Grid>
         <Frame Source="/View/Pages/MenuPage.xaml" NavigationUIVisibility="Hidden"/>
+
+        <i:Interaction.Triggers>
+            <i:EventTrigger EventName="Loaded">
+                <i:InvokeCommandAction Command="{Binding InitializeDBCommand}" />
+            </i:EventTrigger>
+        </i:Interaction.Triggers>
+        
     </Grid>
 </Window>

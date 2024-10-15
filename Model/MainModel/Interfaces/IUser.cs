@@ -9,9 +9,9 @@
         int Id { get; set; }
         string LastName { get; set; }
         string Patronymic { get; set; }
-        public List<User> returnListOfUsersFromFile();
-        public List<User> returnListOfUsersFromDB();
-        public void setListOfUsersFromFile(List<User> ListOfUsersFromFile);
-        public void setListOfUsersFromDB(List<User> ListOfUsersFromDB);
+        public List<User> ReturnListOfUsersFromFile();
+        public List<User> ReturnListOfUsersFromDB();
+        public void SetListOfUsersFromFile(List<User> ListOfUsersFromFile);
+        public void SetListOfUsersFromDB(List<User> ListOfUsersFromDB);
     }
 }
