@@ -11,6 +11,7 @@
   <ItemGroup>
     <None Remove="View\Images\Export.png" />
     <None Remove="View\Images\Import.png" />
+    <None Remove="View\Images\SplashScreen.jpg" />
     <None Remove="View\Images\View.png" />
   </ItemGroup>
 
@@ -35,6 +36,12 @@
     </Resource>
     <Resource Include="View\Images\View.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="View\Images\SplashScreen.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
   </ItemGroup>
 

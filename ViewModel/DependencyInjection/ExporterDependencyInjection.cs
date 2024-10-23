@@ -1,5 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using WpfApp1.Model.Export;
+using WpfApp1.Services.Export;
 using WpfApp1.ViewModel.Factories;
 using WpfApp1.ViewModel.Factories.Interfaces;
 

@@ -1,7 +1,7 @@
 ﻿using Microsoft.Data.SqlClient;
-using WpfApp1.Model.Database.Interfaces;
+using WpfApp1.Data.Database.Interfaces;
 
-namespace WpfApp1.Model.Database
+namespace WpfApp1.Data.Database
 {
     internal class ConnectionStringValidation : IConnectionStringValidation
     {

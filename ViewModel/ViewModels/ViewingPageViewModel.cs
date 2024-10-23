@@ -1,14 +1,21 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
-using WpfApp1.Model.MainModel;
-using WpfApp1.Model.MainModel.Interfaces;
+using WpfApp1.Model;
+using WpfApp1.Model.Interfaces;
 using WpfApp1.MVVM;
+using WpfApp1.ViewModel.DependencyInjection;
 using WpfApp1.ViewModel.Factories.Interfaces;
 
 namespace WpfApp1.ViewModel.ViewModels
 {
     class ViewingPageViewModel : ViewModelBase
     {
+        private readonly IAbstractFactory<IUsers> _usersFactory;
+        public ViewingPageViewModel(DependencyStruct dependencyStruct)
+        {
+            _usersFactory = dependencyStruct.Users;
+        }
+
         private const string Space = " ";
 
         private string _viewTextBoxText;
@@ -36,8 +43,8 @@ namespace WpfApp1.ViewModel.ViewModels
                 return _showSelectionCommand ??
                     (_showSelectionCommand = new RelayCommand(obj =>
                     {
-                        var user = MainWindowViewModel.serviceProvider.GetService<IAbstractFactory<IUser>>()!.Create();
-                        OutputUsersToTextbox(user.ReturnListOfUsersFromFile());
+                        var users = _usersFactory.Create();
+                        OutputUsersToTextbox(users.ReturnListOfUsersFromFile());
                     }
                     ));
             }

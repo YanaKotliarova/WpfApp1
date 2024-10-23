@@ -9,7 +9,10 @@ using WpfApp1.ViewModel.ViewModels;
 
 namespace WpfApp1.View.Pages
 {
-    public partial class MenuPage : Page
+    /// <summary>
+    /// Interaction logic for EnterConnectionStringPage.xaml
+    /// </summary>
+    public partial class EnterConnectionStringPage : Page
     {
         private IAbstractFactory<IRepository<User>> _repositoryFactory =
             App.serviceProvider.GetService<IAbstractFactory<IRepository<User>>>()!;
@@ -17,12 +20,12 @@ namespace WpfApp1.View.Pages
         private IAbstractFactory<IMessage> _messageFactory =
             App.serviceProvider.GetService<IAbstractFactory<IMessage>>()!;
 
-        public MenuPage()
+        public EnterConnectionStringPage()
         {
             DependencyStruct dependencyStruct = new DependencyStruct(_repositoryFactory, _messageFactory);
 
             InitializeComponent();
-            DataContext = new MenuPageViewModel(dependencyStruct);
+            DataContext = new EnterConnectionStringPageViewModel(dependencyStruct);
         }
     }
 }

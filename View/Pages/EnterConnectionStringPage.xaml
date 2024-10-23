@@ -1,0 +1,41 @@
+﻿<Page x:Class="WpfApp1.View.Pages.EnterConnectionStringPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:WpfApp1.View.Pages"
+      mc:Ignorable="d" 
+      d:DesignHeight="450" d:DesignWidth="800"
+      Title="EnterConnectionStringPage"
+      x:Name="ConnectionStringPage"
+      >
+
+    <Grid Background="White" Height="200">
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="70"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="0.2*"/>
+        </Grid.ColumnDefinitions>
+
+        <Label x:Name="labelEnterConnectionString" Grid.Row="0" Grid.ColumnSpan="2"
+               Content="Введите релевантную строку подключения в БД:" FontSize="20" HorizontalAlignment="Left" Margin="23,0,0,0" />
+
+        <TextBox Name ="textBoxNewConnectionString" Grid.Row="1" Grid.Column="0"
+                 Text = "{Binding NewConnectionStringTextBox, UpdateSourceTrigger = PropertyChanged}"
+                 MinHeight="25" MinWidth="630"
+                 TextWrapping="Wrap" AcceptsReturn="True"
+                 VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" ScrollViewer.CanContentScroll="True"
+                 VerticalAlignment="Top" FontSize="14" HorizontalAlignment="Left" Margin="25,0,0,0" />
+
+        <Button Name="InitializeButton" Content="Ввод"
+                Grid.Row="1" Grid.Column="2" HorizontalAlignment="Center" VerticalAlignment="Top"
+                MinWidth="65" MinHeight="25"
+                Command="{Binding ReinitializeDBCommand}" CommandParameter="{Binding ElementName=ConnectionStringPage}"/>
+
+    </Grid>
+</Page>

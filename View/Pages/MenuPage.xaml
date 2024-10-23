@@ -4,8 +4,13 @@
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       xmlns:local="clr-namespace:WpfApp1.View.Pages"
-      xmlns:n="clr-namespace:WpfApp1"
+      xmlns:n="clr-namespace:WpfApp1"      
       mc:Ignorable="d" 
+      
+      x:Name="Menu"
+      
+      xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
+      
       d:DesignHeight="450" d:DesignWidth="800"
       Title="MenuPage">
 
@@ -20,6 +25,12 @@
         <n:NavigationButton x:Name ="ViewButton" Text="View" HorizontalAlignment="Left" VerticalAlignment="Top" MinHeight="70" MinWidth="60"
                             Command="{Binding OpenPageCommand}" CommandParameter="{Binding ElementName=ViewButton}"
                             ImageSource="/View/Images/View.png" NavigationUri="/View/Pages/ViewingPage.xaml" Margin="154,2,2,2"/>
+
+        <i:Interaction.Triggers>
+            <i:EventTrigger EventName="Loaded">
+                <i:InvokeCommandAction Command="{Binding InitializeDBCommand}" CommandParameter="{Binding ElementName=Menu}"/>
+            </i:EventTrigger>
+        </i:Interaction.Triggers>
 
 
     </Grid>

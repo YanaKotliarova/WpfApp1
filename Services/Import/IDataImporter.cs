@@ -1,6 +1,6 @@
-﻿using WpfApp1.Model.MainModel;
+﻿using WpfApp1.Model;
 
-namespace WpfApp1.Model.Import
+namespace WpfApp1.Services.Import
 {
     internal interface IDataImporter
     {

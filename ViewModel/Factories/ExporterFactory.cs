@@ -1,4 +1,4 @@
-﻿using WpfApp1.Model.Export;
+﻿using WpfApp1.Services.Export;
 using WpfApp1.ViewModel.Factories.Interfaces;
 
 namespace WpfApp1.ViewModel.Factories

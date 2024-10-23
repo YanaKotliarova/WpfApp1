@@ -95,12 +95,12 @@
                Margin="10,20,0,0" MinHeight="25" MinWidth="100"/>
         
         <Label x:Name="labelExplanation" Grid.Column="0" Grid.Row="2" Content="Введите данные для выборки для экспорта:" 
-               HorizontalAlignment="Center" VerticalAlignment="Top" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" 
+               VerticalAlignment="Top" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" 
                Margin="0,20,0,0"/>
 
         <Label x:Name="labelFileType" Grid.Column="2" Grid.Row="2" Content="Тип файла:" HorizontalAlignment="Left" 
-               VerticalAlignment="Center" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" 
-               Margin="10,0,0,0" MinWidth="120" MinHeight="25"/>
+               VerticalAlignment="Top" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" 
+               Margin="10,100,0,0" MinWidth="120" MinHeight="25"/>
 
         <RadioButton x:Name="radioButtonExcel" Grid.Column="2" Grid.Row="2"
                  Command="{Binding SelectFileFormatCommand}" CommandParameter=".xlsx"

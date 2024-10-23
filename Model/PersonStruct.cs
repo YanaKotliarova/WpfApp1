@@ -1,4 +1,4 @@
-﻿namespace WpfApp1.Model.MainModel
+﻿namespace WpfApp1.Model
 {
     internal struct PersonStruct
     {

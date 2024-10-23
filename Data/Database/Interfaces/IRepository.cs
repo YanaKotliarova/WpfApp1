@@ -1,11 +1,12 @@
-﻿using WpfApp1.Model.MainModel;
+﻿using WpfApp1.Model;
 
-namespace WpfApp1.Model.Database.Interfaces
+namespace WpfApp1.Data.Database.Interfaces
 {
     internal interface IRepository<T> : IDisposable
         where T : class
     {
-        Task InitializeDBAsync();
+        string ReturnConnectionStringValue();
+        Task InitializeDBAsync(string connectionString);
         Task AddToDBAsync(List<User> ListOfUsersFromFile);
         Task<int> ReturnAmountOfUsersInDBAsync();
         void SetAmountOfViewedUsers(int amount);

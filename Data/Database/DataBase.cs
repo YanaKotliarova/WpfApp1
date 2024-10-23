@@ -1,11 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
-using WpfApp1.Model.Database.Interfaces;
-using WpfApp1.Model.MainModel;
+using WpfApp1.Data.Database.Interfaces;
+using WpfApp1.Model;
 using WpfApp1.ViewModel.Factories.Interfaces;
-using WpfApp1.ViewModel.ViewModels;
 
-namespace WpfApp1.Model.Database
+namespace WpfApp1.Data.Database
 {
     internal class DataBase : IRepository<User>
     {
@@ -16,9 +14,17 @@ namespace WpfApp1.Model.Database
 
         private ApplicationContext db;
 
-        public DataBase()
+        private readonly IAbstractFactory<IConnectionStringValidation> _connectionStringValidationFactory;
+
+        public DataBase(IAbstractFactory<IConnectionStringValidation> connectionStringValidationFactory)
         {
             db = new ApplicationContext();
+            _connectionStringValidationFactory = connectionStringValidationFactory;
+        }
+
+        public string ReturnConnectionStringValue()
+        {
+            return db.ReturnConnectionString();
         }
 
         /// <summary>
@@ -27,11 +33,12 @@ namespace WpfApp1.Model.Database
         /// <param name="db"> An object of the ApplicationContext class, for calling methods of this class.</param>
         /// <returns></returns>
         /// <exception cref="Exception"></exception>
-        public async Task InitializeDBAsync()
+        public async Task InitializeDBAsync(string connectionString)
         {
-            var validateString = MainWindowViewModel.serviceProvider.GetService<IAbstractFactory<IConnectionStringValidation>>()!.Create();
+            db.SetConnectionString(connectionString);
+            var validateString = _connectionStringValidationFactory.Create();
 
-            if (!validateString.ValidateConnectionString(db.ReturnConnectionString()))
+            if (!validateString.ValidateConnectionString(connectionString))
                 throw new Exception("Не валидатная строка подключения к БД.");
 
             await db.Database.MigrateAsync();
@@ -105,17 +112,17 @@ namespace WpfApp1.Model.Database
         }
 
         private bool disposed = false;
-        
+
         public virtual void Dispose(bool disposing)
         {
-            if (!this.disposed)
+            if (!disposed)
             {
                 if (disposing)
                 {
                     db.Dispose();
                 }
             }
-            this.disposed = true;
+            disposed = true;
         }
 
         public void Dispose()

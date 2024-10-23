@@ -1,16 +1,32 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using WpfApp1.Model.Database.Interfaces;
-using WpfApp1.Model.Import;
-using WpfApp1.Model.MainModel;
-using WpfApp1.Model.MainModel.Interfaces;
+using WpfApp1.Data.Database.Interfaces;
+using WpfApp1.Model;
+using WpfApp1.Model.Interfaces;
 using WpfApp1.MVVM;
+using WpfApp1.Services.Import;
 using WpfApp1.View.UI.Interfaces;
+using WpfApp1.ViewModel.DependencyInjection;
 using WpfApp1.ViewModel.Factories.Interfaces;
 
 namespace WpfApp1.ViewModel.ViewModels
 {
     class ImportPageViewModel : ViewModelBase
     {
+        private readonly IAbstractFactory<IDataImporter> _importerFactory;
+        private readonly IAbstractFactory<IRepository<User>> _repositoryFactory;
+        private readonly IAbstractFactory<IFileDialog> _fileDialogFactory;
+        private readonly IAbstractFactory<IMessage> _messageFactory;
+        private readonly IAbstractFactory<IUsers> _usersFactory;
+
+        public ImportPageViewModel(DependencyStruct dependencyStruct)
+        {
+            _importerFactory = dependencyStruct.Importer;
+            _repositoryFactory = dependencyStruct.Repository;
+            _fileDialogFactory = dependencyStruct.FileDialog;
+            _messageFactory = dependencyStruct.Message;
+            _usersFactory = dependencyStruct.Users;
+        }
+
         private string _importTextBoxText = "Выберите, пожалуйста, файл!\t\t\t\t\t\t\t--------->\r\n(в формате csv)";
         /// <summary>
         /// A property associated with the text field used to display information.
@@ -36,29 +52,28 @@ namespace WpfApp1.ViewModel.ViewModels
             {
                 return _readCsvFileAndAddToBDCommand ??
                     (_readCsvFileAndAddToBDCommand = new RelayCommand(async obj =>
-                    {
-
-                        var message = MainWindowViewModel.serviceProvider.GetService<IAbstractFactory<IMessage>>()!.Create();
+                    {                        
                         try
                         {
-                            var fileDialog = MainWindowViewModel.serviceProvider.GetService<IAbstractFactory<IFileDialog>>()!.Create();
-                            var user = MainWindowViewModel.serviceProvider.GetService<IAbstractFactory<IUser>>()!.Create();
+                            var fileDialog = _fileDialogFactory.Create();
+                            var users = _usersFactory.Create();
 
                             if (fileDialog.OpenFileDialog(out string fileName))
                             {
-                                var db = MainWindowViewModel.serviceProvider.GetService<IAbstractFactory<IRepository<User>>>()!.Create();
+                                var db = _repositoryFactory.Create();
 
-                                var fileImporter = MainWindowViewModel.serviceProvider.GetService<IAbstractFactory<IDataImporter>>()!.Create();
+                                var fileImporter = _importerFactory.Create();
                                 ImportText = "Открытие файла и перенос данных могут занять некоторое время...";
-                                await fileImporter.ReadFromFileAsync(fileName, user.ReturnListOfUsersFromFile());
+                                await fileImporter.ReadFromFileAsync(fileName, users.ReturnListOfUsersFromFile());
 
-                                await db.AddToDBAsync(user.ReturnListOfUsersFromFile());
+                                await db.AddToDBAsync(users.ReturnListOfUsersFromFile());
 
                                 ImportText = "Данные загружены в базу даных и готовы к экспорту.";
                             }
                         }
                         catch (Exception ex)
                         {
+                            var message = _messageFactory.Create();
                             message.ShowMessage(ex.Message);
                         }
 

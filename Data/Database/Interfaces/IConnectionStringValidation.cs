@@ -1,4 +1,4 @@
-﻿namespace WpfApp1.Model.Database.Interfaces
+﻿namespace WpfApp1.Data.Database.Interfaces
 {
     internal interface IConnectionStringValidation
     {

@@ -1,11 +1,10 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using Microsoft.IdentityModel.Tokens;
-using WpfApp1.Model.Database.Interfaces;
-using WpfApp1.Model.MainModel;
-using WpfApp1.Model.MainModel.Interfaces;
+﻿using Microsoft.IdentityModel.Tokens;
+using WpfApp1.Data.Database.Interfaces;
+using WpfApp1.Model;
+using WpfApp1.Model.Interfaces;
 using WpfApp1.MVVM;
-using WpfApp1.View.UI;
 using WpfApp1.View.UI.Interfaces;
+using WpfApp1.ViewModel.DependencyInjection;
 using WpfApp1.ViewModel.Factories.Interfaces;
 
 namespace WpfApp1.ViewModel.ViewModels
@@ -22,6 +21,21 @@ namespace WpfApp1.ViewModel.ViewModels
         private const string DefaultFileName = "DefaultFileName";
 
         private string _fileExtension = "";
+
+        private readonly IExporterFactory _exporterFactory;
+        private readonly IAbstractFactory<IRepository<User>> _repositoryFactory;
+        private readonly IAbstractFactory<IDataFormatter> _dataFormatterFactory;
+        private readonly IAbstractFactory<IMessage> _messageFactory;
+        private readonly IAbstractFactory<IUsers> _usersFactory;
+
+        public ExportPageViewModel(DependencyStruct dependencyStruct)
+        {
+            _exporterFactory = dependencyStruct.Exporter;
+            _repositoryFactory = dependencyStruct.Repository;
+            _dataFormatterFactory = dependencyStruct.DataFormatter;
+            _messageFactory = dependencyStruct.Message;
+            _usersFactory = dependencyStruct.Users;
+        }
 
         private string _exportTextBoxText = "Введите данные для выборки, выберите тип файла, а затем нажмите кнопку экспорта.";
         /// <summary>
@@ -54,11 +68,10 @@ namespace WpfApp1.ViewModel.ViewModels
                 return _exportIntoFileCommand ??
                     (_exportIntoFileCommand = new RelayCommand(async obj =>
                     {
-
-                        var db = MainWindowViewModel.serviceProvider.GetService<IAbstractFactory<IRepository<User>>>()!.Create();
-                        var formatter = MainWindowViewModel.serviceProvider.GetService<IAbstractFactory<IDataFormatter>>()!.Create();
-                        var message = MainWindowViewModel.serviceProvider.GetService<IAbstractFactory<IMessage>>()!.Create();
-                        var user = MainWindowViewModel.serviceProvider.GetService<IAbstractFactory<IUser>>()!.Create();
+                        var db = _repositoryFactory.Create();
+                        var formatter = _dataFormatterFactory.Create();
+                        var message = _messageFactory.Create();
+                        var users = _usersFactory.Create();
 
                         string newFileName = DefaultFileName;
                         if (!FileNameTextBox.IsNullOrEmpty())
@@ -85,11 +98,11 @@ namespace WpfApp1.ViewModel.ViewModels
 
                                 while (db.ReturnAmountOfViewedUsers() <= amountOfUsersInDB)
                                 {
-                                    user.SetListOfUsersFromDB(await db.GetFromDBAsync(person, entranceInfo, user.ReturnListOfUsersFromDB()));
+                                    users.SetListOfUsersFromDB(await db.GetFromDBAsync(person, entranceInfo, users.ReturnListOfUsersFromDB()));
 
-                                    user.ReturnListOfUsersFromFile().AddRange(user.ReturnListOfUsersFromDB());
+                                    users.ReturnListOfUsersFromFile().AddRange(users.ReturnListOfUsersFromDB());
 
-                                    if (user.ReturnListOfUsersFromDB().Count > 0)
+                                    if (users.ReturnListOfUsersFromDB().Count > 0)
                                         await AddToFileAsync(newFileName);
                                 }
                                 message.ShowMessage("Файл " + newFileName + _fileExtension + " создан!");
@@ -137,17 +150,15 @@ namespace WpfApp1.ViewModel.ViewModels
         /// <returns></returns>
         private async Task CreateFileAsync(string newFileName)
         {
-            var exporterFactory = MainWindowViewModel.serviceProvider.GetService<IExporterFactory>();
-
             if (_fileExtension.Equals(ExcelExtension))
             {
-                var fileExporter = exporterFactory.GetExporter(ExcelExporterName);
+                var fileExporter = _exporterFactory.GetExporter(ExcelExporterName);
                 newFileName += ExcelExtension;
                 await fileExporter.CreateFileAsync(newFileName);
             }
             else if (_fileExtension.Equals(XmlExtension))
             {
-                var fileExporter = exporterFactory.GetExporter(XmlExporterName);
+                var fileExporter = _exporterFactory.GetExporter(XmlExporterName);
                 newFileName += XmlExtension;
                 await fileExporter.CreateFileAsync(newFileName);
             }
@@ -165,20 +176,19 @@ namespace WpfApp1.ViewModel.ViewModels
         /// <returns></returns>
         private async Task AddToFileAsync(string newFileName)
         {
-            var exporterFactory = MainWindowViewModel.serviceProvider.GetService<IExporterFactory>();
-            var user = MainWindowViewModel.serviceProvider.GetService<IAbstractFactory<IUser>>()!.Create();
+            var users = _usersFactory.Create();
 
             if (_fileExtension.Equals(ExcelExtension))
             {
-                var fileExporter = exporterFactory.GetExporter(ExcelExporterName);
+                var fileExporter = _exporterFactory.GetExporter(ExcelExporterName);
                 newFileName += ExcelExtension;
-                await fileExporter.AddToFileAsync(newFileName, user.ReturnListOfUsersFromDB());
+                await fileExporter.AddToFileAsync(newFileName, users.ReturnListOfUsersFromDB());
             }
             else if (_fileExtension.Equals(XmlExtension))
             {
-                var fileExporter = exporterFactory.GetExporter(XmlExporterName);
+                var fileExporter = _exporterFactory.GetExporter(XmlExporterName);
                 newFileName += XmlExtension;
-                await fileExporter.AddToFileAsync(newFileName, user.ReturnListOfUsersFromDB());
+                await fileExporter.AddToFileAsync(newFileName, users.ReturnListOfUsersFromDB());
             }
 
         }
@@ -234,8 +244,6 @@ namespace WpfApp1.ViewModel.ViewModels
             get { return _firstNameTextBox; }
             set
             {
-
-                var message = MainWindowViewModel.serviceProvider.GetService<Message>();
                 try
                 {
                     TextBoxDataValidating(value);
@@ -245,6 +253,7 @@ namespace WpfApp1.ViewModel.ViewModels
                 }
                 catch (Exception ex)
                 {
+                    var message = _messageFactory.Create();
                     message.ShowMessage(ex.Message);
                 }
 
@@ -261,8 +270,6 @@ namespace WpfApp1.ViewModel.ViewModels
             get { return _lastNameTextBox; }
             set
             {
-
-                var message = MainWindowViewModel.serviceProvider.GetService<IAbstractFactory<IMessage>>()!.Create();
                 try
                 {
                     TextBoxDataValidating(value);
@@ -272,10 +279,9 @@ namespace WpfApp1.ViewModel.ViewModels
                 }
                 catch (Exception ex)
                 {
+                    var message = _messageFactory.Create();
                     message.ShowMessage(ex.Message);
                 }
-
-
             }
         }
 
@@ -289,8 +295,6 @@ namespace WpfApp1.ViewModel.ViewModels
             get { return _patronymicTextBox; }
             set
             {
-
-                var message = MainWindowViewModel.serviceProvider.GetService<IAbstractFactory<IMessage>>()!.Create();
                 try
                 {
                     TextBoxDataValidating(value);
@@ -300,9 +304,9 @@ namespace WpfApp1.ViewModel.ViewModels
                 }
                 catch (Exception ex)
                 {
+                    var message = _messageFactory.Create();
                     message.ShowMessage(ex.Message);
                 }
-
             }
         }
 
@@ -316,7 +320,6 @@ namespace WpfApp1.ViewModel.ViewModels
             get { return _cityTextBox; }
             set
             {
-                var message = MainWindowViewModel.serviceProvider.GetService<IAbstractFactory<IMessage>>()!.Create();
                 try
                 {
                     TextBoxDataValidating(value);
@@ -326,9 +329,9 @@ namespace WpfApp1.ViewModel.ViewModels
                 }
                 catch (Exception ex)
                 {
+                    var message = _messageFactory.Create();
                     message.ShowMessage(ex.Message);
                 }
-
             }
         }
 
@@ -342,7 +345,6 @@ namespace WpfApp1.ViewModel.ViewModels
             get { return _countryTextBox; }
             set
             {
-                var message = MainWindowViewModel.serviceProvider.GetService<IAbstractFactory<IMessage>>()!.Create();
                 try
                 {
                     TextBoxDataValidating(value);
@@ -352,6 +354,7 @@ namespace WpfApp1.ViewModel.ViewModels
                 }
                 catch (Exception ex)
                 {
+                    var message = _messageFactory.Create();
                     message.ShowMessage(ex.Message);
                 }
             }

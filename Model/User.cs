@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using WpfApp1.Model.MainModel.Interfaces;
+using WpfApp1.Model.Interfaces;
 
-namespace WpfApp1.Model.MainModel
+namespace WpfApp1.Model
 {
     internal class User : IUser
     {
@@ -14,25 +14,6 @@ namespace WpfApp1.Model.MainModel
         public string City { get; set; }
         public string Country { get; set; }
 
-        internal List<User> listOfUsersFromFile = new List<User>();
-        internal List<User> listOfUsersFromDB = new List<User>();
-
-        public List<User> ReturnListOfUsersFromFile()
-        {
-            return listOfUsersFromFile;
-        }
-        public List<User> ReturnListOfUsersFromDB()
-        {
-            return listOfUsersFromDB;
-        }
-        public void SetListOfUsersFromFile(List<User> listOfUsersFromFile)
-        {
-            this.listOfUsersFromFile = listOfUsersFromFile;
-        }
-        public void SetListOfUsersFromDB(List<User> listOfUsersFromDB)
-        {
-            this.listOfUsersFromDB = listOfUsersFromDB;
-        }
         public User() { }
 
         /// <summary>

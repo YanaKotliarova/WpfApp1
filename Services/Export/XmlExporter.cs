@@ -1,8 +1,8 @@
 ﻿using Microsoft.IdentityModel.Tokens;
 using System.Xml.Linq;
-using WpfApp1.Model.MainModel;
+using WpfApp1.Model;
 
-namespace WpfApp1.Model.Export
+namespace WpfApp1.Services.Export
 {
     internal class XmlExporter : IDataExporter
     {
