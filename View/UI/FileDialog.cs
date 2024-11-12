@@ -5,7 +5,10 @@ namespace WpfApp1.View.UI
 {
     internal class FileDialog: IFileDialog
     {
-        private const string FileExtensionFilter = "Text files (*.csv) | *.csv";
+        private const string OpenFileExtensionFilter = "Special text files (*.csv) | *.csv";
+        private const string SaveFileExtensionFilter = "Excel documents|*.xlsx|Xml documents|*.xml";
+
+        private const string DefaultFileName = "Users";
 
         /// <summary>
         /// The method for opening the file selection dialog.
@@ -16,7 +19,7 @@ namespace WpfApp1.View.UI
         {
             var openFileDialog = new OpenFileDialog();
 
-            openFileDialog.Filter = FileExtensionFilter;
+            openFileDialog.Filter = OpenFileExtensionFilter;
             openFileDialog.Multiselect = false;
 
             bool? result = openFileDialog.ShowDialog();
@@ -29,6 +32,27 @@ namespace WpfApp1.View.UI
             {
                 fileName = "";
                 throw new Exception("Ошибка открытия файла");
+            }
+            return (bool)result;
+        }
+
+        public bool SaveFileDialog(out string fileName)
+        {
+            var saveFileDialog = new SaveFileDialog();
+
+            saveFileDialog.FileName = DefaultFileName;
+            saveFileDialog.Filter = SaveFileExtensionFilter;
+
+            bool? result = saveFileDialog.ShowDialog();
+
+            if (result == true)
+            {
+                fileName = saveFileDialog.FileName;
+            }
+            else
+            {
+                fileName = "";
+                throw new Exception("Ошибка сохранения файла");
             }
             return (bool)result;
         }

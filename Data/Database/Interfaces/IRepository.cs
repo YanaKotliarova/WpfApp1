@@ -7,10 +7,12 @@ namespace WpfApp1.Data.Database.Interfaces
     {
         string ReturnConnectionStringValue();
         Task InitializeDBAsync(string connectionString);
-        Task AddToDBAsync(List<User> ListOfUsersFromFile);
+        Task AddToDBAsync(List<User> listOfUsersFromFile);
         Task<int> ReturnAmountOfUsersInDBAsync();
         void SetAmountOfViewedUsers(int amount);
         int ReturnAmountOfViewedUsers();
-        Task<List<User>> GetFromDBAsync(PersonStruct person, EntranceInfoStruct entranceInfo, List<User> ListOfUsersFromDB);
+        bool AreThereUsersInDB();
+        bool ReturnIsDBEmpty();
+        IAsyncEnumerable<List<User>> GetSelectionFromDBAsync(PersonStruct person, EntranceInfoStruct entranceInfo);
     }
 }

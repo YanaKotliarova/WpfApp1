@@ -1,27 +1,34 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.IdentityModel.Tokens;
+using System.Windows;
 using WpfApp1.Data.Database.Interfaces;
 using WpfApp1.Model;
-using WpfApp1.ViewModel.Factories.Interfaces;
 
 namespace WpfApp1.Data.Database
 {
     internal class DataBase : IRepository<User>
     {
-        private const int AmountOfUsersForSelection = 3;
+        private const int AmountOfUsersForSelection = 1000;
 
-        internal int amoutOfUsersInDB = 0;
-        internal int amountOfViewedUsers = 0;
+        private readonly ApplicationContext db;
+        private readonly IConnectionStringValidation _connectionStringValidation;
 
-        private ApplicationContext db;
-
-        private readonly IAbstractFactory<IConnectionStringValidation> _connectionStringValidationFactory;
-
-        public DataBase(IAbstractFactory<IConnectionStringValidation> connectionStringValidationFactory)
+        public DataBase(IConnectionStringValidation connectionStringValidation)
         {
             db = new ApplicationContext();
-            _connectionStringValidationFactory = connectionStringValidationFactory;
+            _connectionStringValidation = connectionStringValidation;
         }
 
+        private int _amoutOfUsersInDB = 0;
+        private int _amountOfViewedUsers = 0;
+
+        private bool _isDBEmpty;
+
+        /// <summary>
+        /// Return value of connection string.
+        /// </summary>
+        /// <returns></returns>
         public string ReturnConnectionStringValue()
         {
             return db.ReturnConnectionString();
@@ -36,26 +43,23 @@ namespace WpfApp1.Data.Database
         public async Task InitializeDBAsync(string connectionString)
         {
             db.SetConnectionString(connectionString);
-            var validateString = _connectionStringValidationFactory.Create();
-
-            if (!validateString.ValidateConnectionString(connectionString))
+            if (!_connectionStringValidation.ValidateConnectionString(connectionString))
                 throw new Exception("Не валидатная строка подключения к БД.");
-
             await db.Database.MigrateAsync();
+            _isDBEmpty = AreThereUsersInDB();
         }
 
         /// <summary>
         /// Asynchronous method of writing data to DB.
         /// </summary>
         /// <returns></returns>
-        public async Task AddToDBAsync(List<User> ListOfUsersFromFile)
+        public async Task AddToDBAsync(List<User> listOfUsersFromFile)
         {
-            foreach (User user in ListOfUsersFromFile)
-                await db.Users.AddAsync(user);
-
+            await db.Users.AddRangeAsync(listOfUsersFromFile);
             await db.SaveChangesAsync();
 
-            ListOfUsersFromFile.Clear();
+            listOfUsersFromFile.Clear();
+            _isDBEmpty = AreThereUsersInDB();
         }
 
         /// <summary>
@@ -64,8 +68,26 @@ namespace WpfApp1.Data.Database
         /// <returns></returns>
         public async Task<int> ReturnAmountOfUsersInDBAsync()
         {
-            amoutOfUsersInDB = await db.Users.CountAsync();
-            return amoutOfUsersInDB;
+            _amoutOfUsersInDB = await db.Users.CountAsync();
+            return _amoutOfUsersInDB;
+        }
+
+        /// <summary>
+        /// The method for checking if DB is empty.
+        /// </summary>
+        /// <returns></returns>
+        public bool AreThereUsersInDB()
+        {
+            return db.Users.IsNullOrEmpty();
+        }
+
+        /// <summary>
+        /// The method for returning the value of DB emptiness checking.
+        /// </summary>
+        /// <returns></returns>
+        public bool ReturnIsDBEmpty()
+        {
+            return _isDBEmpty;
         }
 
         /// <summary>
@@ -74,7 +96,7 @@ namespace WpfApp1.Data.Database
         /// <param name="amount"></param>
         public void SetAmountOfViewedUsers(int amount)
         {
-            amountOfViewedUsers = amount;
+            _amountOfViewedUsers = amount;
         }
 
         /// <summary>
@@ -83,7 +105,7 @@ namespace WpfApp1.Data.Database
         /// <returns></returns>
         public int ReturnAmountOfViewedUsers()
         {
-            return amountOfViewedUsers;
+            return _amountOfViewedUsers;
         }
 
         /// <summary>
@@ -92,12 +114,15 @@ namespace WpfApp1.Data.Database
         /// </summary>
         /// <param name="person"> The structure with the user's personal data. </param>
         /// <param name="entranceInfo"> A structure with user entrance data. </param>
-        /// <param name="ListOfUsersFromDB"> List of users from DB. </param>
         /// <returns></returns>
-        public async Task<List<User>> GetFromDBAsync(PersonStruct person, EntranceInfoStruct entranceInfo, List<User> ListOfUsersFromDB)
+        public async IAsyncEnumerable<List<User>> GetSelectionFromDBAsync(PersonStruct person, EntranceInfoStruct entranceInfo)
         {
-            ListOfUsersFromDB = await
-                (from user in db.Users.Skip(amountOfViewedUsers).Take(AmountOfUsersForSelection)
+            List<User> listOfUsersFromDB = new List<User>();
+
+            while (_amountOfViewedUsers < _amoutOfUsersInDB)
+            {
+                listOfUsersFromDB.AddRange(await
+                (from user in db.Users.Skip(_amountOfViewedUsers).Take(AmountOfUsersForSelection)
                  where
                  EF.Functions.Like(user.Date.ToString(), entranceInfo.DateOfEntrance) &&
                  EF.Functions.Like(user.FirstName, person.FirstName) &&
@@ -105,14 +130,19 @@ namespace WpfApp1.Data.Database
                  EF.Functions.Like(user.Patronymic, person.Patronymic) &&
                  EF.Functions.Like(user.City, entranceInfo.City) &&
                  EF.Functions.Like(user.Country, entranceInfo.Country)
-                 select user).ToListAsync();
+                 select user).ToListAsync());
 
-            amountOfViewedUsers += AmountOfUsersForSelection;
-            return ListOfUsersFromDB;
+                _amountOfViewedUsers += AmountOfUsersForSelection;
+
+                if (listOfUsersFromDB.Count >= AmountOfUsersForSelection || _amountOfViewedUsers >= _amoutOfUsersInDB)
+                {
+                    yield return listOfUsersFromDB;
+                    listOfUsersFromDB.Clear();
+                }
+            }
         }
 
         private bool disposed = false;
-
         public virtual void Dispose(bool disposing)
         {
             if (!disposed)

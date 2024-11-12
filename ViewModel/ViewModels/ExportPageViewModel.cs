@@ -1,10 +1,9 @@
-﻿using Microsoft.IdentityModel.Tokens;
+﻿using System.IO;
 using WpfApp1.Data.Database.Interfaces;
 using WpfApp1.Model;
 using WpfApp1.Model.Interfaces;
 using WpfApp1.MVVM;
 using WpfApp1.View.UI.Interfaces;
-using WpfApp1.ViewModel.DependencyInjection;
 using WpfApp1.ViewModel.Factories.Interfaces;
 
 namespace WpfApp1.ViewModel.ViewModels
@@ -17,27 +16,29 @@ namespace WpfApp1.ViewModel.ViewModels
         private const string ExcelExporterName = "ExcelExporter";
         private const string XmlExporterName = "XmlExporter";
 
-        private const string Space = " ";
-        private const string DefaultFileName = "DefaultFileName";
+        private const string DefaultExportTextBoxMessage = "Введите данные для выборки, выберите тип файла, а затем нажмите кнопку экспорта.";
+
+        private readonly IExporterFactory _exporter;
+        private readonly IRepository<User> _repository;
+        private readonly IDataFormatter _dataFormatter;
+        private readonly IFileDialog _fileDialog;
+        private readonly IMetroDialog _metroDialog;
+        private readonly IUsers _users;
+
+        public ExportPageViewModel(IExporterFactory exporter, IRepository<User> repository, IDataFormatter dataFormatter,
+            IFileDialog fileDialog, IMetroDialog metroDialog, IUsers users)
+        {
+            _exporter = exporter;
+            _repository = repository;
+            _dataFormatter = dataFormatter;
+            _fileDialog = fileDialog;
+            _metroDialog = metroDialog;
+            _users = users;
+        }
 
         private string _fileExtension = "";
 
-        private readonly IExporterFactory _exporterFactory;
-        private readonly IAbstractFactory<IRepository<User>> _repositoryFactory;
-        private readonly IAbstractFactory<IDataFormatter> _dataFormatterFactory;
-        private readonly IAbstractFactory<IMessage> _messageFactory;
-        private readonly IAbstractFactory<IUsers> _usersFactory;
-
-        public ExportPageViewModel(DependencyStruct dependencyStruct)
-        {
-            _exporterFactory = dependencyStruct.Exporter;
-            _repositoryFactory = dependencyStruct.Repository;
-            _dataFormatterFactory = dependencyStruct.DataFormatter;
-            _messageFactory = dependencyStruct.Message;
-            _usersFactory = dependencyStruct.Users;
-        }
-
-        private string _exportTextBoxText = "Введите данные для выборки, выберите тип файла, а затем нажмите кнопку экспорта.";
+        private string _exportTextBoxText;
         /// <summary>
         /// A property associated with the text field used to display information.
         /// </summary>
@@ -51,15 +52,31 @@ namespace WpfApp1.ViewModel.ViewModels
             }
         }
 
+
+        private RelayCommand _pageIsLoadedCommand;
+        /// <summary>
+        /// The command which is called when page is loaded and change text of main text box on export page.
+        /// </summary>
+        public RelayCommand PageIsLoadedCommand
+        {
+            get
+            {
+                return _pageIsLoadedCommand ??
+                    (_pageIsLoadedCommand = new RelayCommand(obj =>
+                    {
+                        ExportText = DefaultExportTextBoxMessage;
+                    }));
+            }
+        }
+
         private RelayCommand _exportIntoFileCommand;
         /// <summary>
         /// The command associated with the data export button, 
         /// which collects the entered data from text fields, 
         /// creates structures with data about users to be searched in DB, 
-        /// then creates a file of chosen format and 
+        /// then creates a file of chosen format, 
         /// launches a gradual selection from DB and 
-        /// writes users to this file. After creating the file, 
-        /// the created selection is displayed in the main text field.
+        /// writes users to this file.
         /// </summary>
         public RelayCommand ExportIntoFileCommand
         {
@@ -68,78 +85,107 @@ namespace WpfApp1.ViewModel.ViewModels
                 return _exportIntoFileCommand ??
                     (_exportIntoFileCommand = new RelayCommand(async obj =>
                     {
-                        var db = _repositoryFactory.Create();
-                        var formatter = _dataFormatterFactory.Create();
-                        var message = _messageFactory.Create();
-                        var users = _usersFactory.Create();
-
-                        string newFileName = DefaultFileName;
-                        if (!FileNameTextBox.IsNullOrEmpty())
-                            newFileName = FileNameTextBox;
-
-                        string date = formatter.FormateDate(DatePicker);
-                        string firstName = formatter.FormateStringData(FirstNameTextBox);
-                        string lastName = formatter.FormateStringData(LastNameTextBox);
-                        string patronymic = formatter.FormateStringData(PatronymicTextBox);
-                        string city = formatter.FormateStringData(CityTextBox);
-                        string country = formatter.FormateStringData(CountryTextBox);
-
-                        PersonStruct person = new PersonStruct(firstName, lastName, patronymic);
-                        EntranceInfoStruct entranceInfo = new EntranceInfoStruct(date, city, country);
-
-                        int amountOfUsersInDB = 0;
                         try
                         {
-                            amountOfUsersInDB = await db.ReturnAmountOfUsersInDBAsync();
-
-                            if (amountOfUsersInDB > 0)
+                            if (_fileDialog.SaveFileDialog(out string newFileName))
                             {
+                                IsExportAvailable = true;
+                                _fileExtension = Path.GetExtension(newFileName);
+
+                                ExportText = "Экспорт может занять некоторое время, пожалуйста подождите...";
+
+                                DisplayProgressBar = true;
+                                IsExportAvailable = false;
+
+                                string date = _dataFormatter.FormateDate(DatePicker);
+                                DatePicker = null;
+
+                                string firstName = _dataFormatter.FormateStringData(FirstNameTextBox);
+                                FirstNameTextBox = "";
+
+                                string lastName = _dataFormatter.FormateStringData(LastNameTextBox);
+                                LastNameTextBox = "";
+
+                                string patronymic = _dataFormatter.FormateStringData(PatronymicTextBox);
+                                PatronymicTextBox = "";
+
+                                string city = _dataFormatter.FormateStringData(CityTextBox);
+                                CityTextBox = "";
+
+                                string country = _dataFormatter.FormateStringData(CountryTextBox);
+                                CountryTextBox = "";
+
+                                PersonStruct person = new PersonStruct(firstName, lastName, patronymic);
+                                EntranceInfoStruct entranceInfo = new EntranceInfoStruct(date, city, country);
+
+                                _users.ReturnListOfUsersForView().Clear();
+
+                                int amountOfUsersInDB = 0;
+
+                                amountOfUsersInDB = await _repository.ReturnAmountOfUsersInDBAsync();
+
                                 await CreateFileAsync(newFileName);
-
-                                while (db.ReturnAmountOfViewedUsers() <= amountOfUsersInDB)
+                                await Task.Run(async () =>
                                 {
-                                    users.SetListOfUsersFromDB(await db.GetFromDBAsync(person, entranceInfo, users.ReturnListOfUsersFromDB()));
+                                    await foreach (List<User> list in _repository.GetSelectionFromDBAsync(person, entranceInfo))
+                                    {
+                                        _users.SetListOfUsersFromDB(list);
 
-                                    users.ReturnListOfUsersFromFile().AddRange(users.ReturnListOfUsersFromDB());
+                                        if (_users.ReturnListOfUsersFromDB().Count > 0)
+                                        {
+                                            if (_users.ReturnListOfUsersForView().Count() < 1000)
+                                                _users.ReturnListOfUsersForView().AddRange(_users.ReturnListOfUsersFromDB());
+                                            await AddToFileAsync(newFileName, _users.ReturnListOfUsersFromDB());
+                                        }
 
-                                    if (users.ReturnListOfUsersFromDB().Count > 0)
-                                        await AddToFileAsync(newFileName);
-                                }
-                                message.ShowMessage("Файл " + newFileName + _fileExtension + " создан!");
-                                db.SetAmountOfViewedUsers(0);
-                                ExportText = $"Созданную выборку можно увидеть в созданном файле: {newFileName + _fileExtension} " +
+                                        _users.ReturnListOfUsersFromDB().Clear();
+                                    }
+                                });
+
+                                DisplayProgressBar = false;
+                                IsExportAvailable = true;
+
+                                await _metroDialog.MetroDialogMessage(this, "Успешное создание файла", "Файл " + newFileName + " создан!");
+                                _repository.SetAmountOfViewedUsers(0);
+                                ExportText = $"Созданную выборку можно увидеть в созданном файле: \"{newFileName}\" " +
                                 $"либо на вкладке \"Просмотр\"";
                             }
-                            else throw new Exception("Невозможно создать выборку: БД пуста!");
                         }
                         catch (Exception ex)
                         {
-                            message.ShowMessage(ex.Message);
+                            await _metroDialog.MetroDialogMessage(this, "При создании файла произошла ошибка", ex.Message);
+                            DisplayProgressBar = false;
+                            IsExportAvailable = true;
                         }
-
-
-                    }
-                    ));
+                    }));
             }
         }
 
-        private RelayCommand _selectFileFormatCommand;
+        private bool _displayProgressBar = false;
         /// <summary>
-        /// A command associated with two RadioButton buttons to select the format of the saved file.
+        /// A property associated with an IsVisible property of progress bar.
         /// </summary>
-        public RelayCommand SelectFileFormatCommand
+        public bool DisplayProgressBar
         {
-            get
+            get { return _displayProgressBar; }
+            set
             {
-                return _selectFileFormatCommand ??
-                    (_selectFileFormatCommand = new RelayCommand(obj =>
-                    {
-                        if (obj.Equals(ExcelExtension))
-                            _fileExtension = ExcelExtension;
-                        else if (obj.Equals(XmlExtension))
-                            _fileExtension = XmlExtension;
-                    }
-                    ));
+                _displayProgressBar = value;
+                OnPropertyChanged(nameof(DisplayProgressBar));
+            }
+        }
+
+        private bool _isExportAvailable = true;
+        /// <summary>
+        /// A property associated with an IsEnable property of export button.
+        /// </summary>
+        public bool IsExportAvailable
+        {
+            get { return _isExportAvailable; }
+            set
+            {
+                _isExportAvailable = value;
+                OnPropertyChanged(nameof(IsExportAvailable));
             }
         }
 
@@ -152,14 +198,12 @@ namespace WpfApp1.ViewModel.ViewModels
         {
             if (_fileExtension.Equals(ExcelExtension))
             {
-                var fileExporter = _exporterFactory.GetExporter(ExcelExporterName);
-                newFileName += ExcelExtension;
+                var fileExporter = _exporter.GetExporter(ExcelExporterName);
                 await fileExporter.CreateFileAsync(newFileName);
             }
             else if (_fileExtension.Equals(XmlExtension))
             {
-                var fileExporter = _exporterFactory.GetExporter(XmlExporterName);
-                newFileName += XmlExtension;
+                var fileExporter = _exporter.GetExporter(XmlExporterName);
                 await fileExporter.CreateFileAsync(newFileName);
             }
             else
@@ -173,22 +217,19 @@ namespace WpfApp1.ViewModel.ViewModels
         /// An asynchronous method for adding selected data to a file.
         /// </summary>
         /// <param name="newFileName"></param>
+        /// <param name="listOfUsersFromDB"></param>
         /// <returns></returns>
-        private async Task AddToFileAsync(string newFileName)
+        private async Task AddToFileAsync(string newFileName, List<User> listOfUsersFromDB)
         {
-            var users = _usersFactory.Create();
-
             if (_fileExtension.Equals(ExcelExtension))
             {
-                var fileExporter = _exporterFactory.GetExporter(ExcelExporterName);
-                newFileName += ExcelExtension;
-                await fileExporter.AddToFileAsync(newFileName, users.ReturnListOfUsersFromDB());
+                var fileExporter = _exporter.GetExporter(ExcelExporterName);
+                await fileExporter.AddToFileAsync(newFileName, listOfUsersFromDB);
             }
             else if (_fileExtension.Equals(XmlExtension))
             {
-                var fileExporter = _exporterFactory.GetExporter(XmlExporterName);
-                newFileName += XmlExtension;
-                await fileExporter.AddToFileAsync(newFileName, users.ReturnListOfUsersFromDB());
+                var fileExporter = _exporter.GetExporter(XmlExporterName);
+                await fileExporter.AddToFileAsync(newFileName, listOfUsersFromDB);
             }
 
         }
@@ -253,8 +294,7 @@ namespace WpfApp1.ViewModel.ViewModels
                 }
                 catch (Exception ex)
                 {
-                    var message = _messageFactory.Create();
-                    message.ShowMessage(ex.Message);
+                    _metroDialog.MetroDialogMessage(this, "Неверный ввод", ex.Message);
                 }
 
             }
@@ -279,8 +319,7 @@ namespace WpfApp1.ViewModel.ViewModels
                 }
                 catch (Exception ex)
                 {
-                    var message = _messageFactory.Create();
-                    message.ShowMessage(ex.Message);
+                    _metroDialog.MetroDialogMessage(this, "Неверный ввод", ex.Message);
                 }
             }
         }
@@ -304,8 +343,7 @@ namespace WpfApp1.ViewModel.ViewModels
                 }
                 catch (Exception ex)
                 {
-                    var message = _messageFactory.Create();
-                    message.ShowMessage(ex.Message);
+                    _metroDialog.MetroDialogMessage(this, "Неверный ввод", ex.Message);
                 }
             }
         }
@@ -329,8 +367,7 @@ namespace WpfApp1.ViewModel.ViewModels
                 }
                 catch (Exception ex)
                 {
-                    var message = _messageFactory.Create();
-                    message.ShowMessage(ex.Message);
+                    _metroDialog.MetroDialogMessage(this, "Неверный ввод", ex.Message);
                 }
             }
         }
@@ -354,8 +391,7 @@ namespace WpfApp1.ViewModel.ViewModels
                 }
                 catch (Exception ex)
                 {
-                    var message = _messageFactory.Create();
-                    message.ShowMessage(ex.Message);
+                    _metroDialog.MetroDialogMessage(this, "Неверный ввод", ex.Message);
                 }
             }
         }

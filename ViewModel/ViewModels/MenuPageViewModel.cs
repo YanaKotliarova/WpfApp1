@@ -1,24 +1,27 @@
-﻿using System.Windows.Controls;
+﻿using Microsoft.IdentityModel.Tokens;
 using System.Windows.Navigation;
 using WpfApp1.Data.Database.Interfaces;
 using WpfApp1.Model;
+using WpfApp1.Model.Interfaces;
 using WpfApp1.MVVM;
 using WpfApp1.View.UI.Interfaces;
-using WpfApp1.ViewModel.DependencyInjection;
-using WpfApp1.ViewModel.Factories.Interfaces;
 
 namespace WpfApp1.ViewModel.ViewModels
 {
     class MenuPageViewModel : ViewModelBase
-    {
-        private readonly IAbstractFactory<IRepository<User>> _repositoryFactory;
-        private readonly IAbstractFactory<IMessage> _messageFactory;
+    {      
+        private readonly IRepository<User> _repository;
+        private readonly IMetroDialog _metroDialog;
+        private readonly IUsers _users;
 
-        public MenuPageViewModel(DependencyStruct dependencyStruct)
+        public MenuPageViewModel(IRepository<User> repository, IMetroDialog metroDialog, IUsers users)
         {
-            _repositoryFactory = dependencyStruct.Repository;
-            _messageFactory = dependencyStruct.Message;
+            _repository = repository;
+            _metroDialog = metroDialog;
+            _users = users;
         }
+
+        private int _amountOfUsersInDB = 0;
 
         private RelayCommand _openPageCommand;
         /// <summary>
@@ -29,7 +32,7 @@ namespace WpfApp1.ViewModel.ViewModels
             get
             {
                 return _openPageCommand ??
-                    (_openPageCommand = new RelayCommand(obj =>
+                    (_openPageCommand = new RelayCommand(async obj =>
                     {
                         try
                         {
@@ -42,48 +45,50 @@ namespace WpfApp1.ViewModel.ViewModels
                         }
                         catch (Exception ex)
                         {
-                            var message = _messageFactory.Create();
-                            message.ShowMessage(ex.Message);
+                            await _metroDialog.MetroDialogMessage(this, "Ошибка при переходе на страницу", ex.Message);
                         }
                     }
                     ));
             }
         }
 
-        private RelayCommand _initializeDBCommand;
+        private RelayCommand _pageIsLoadedCommand;
         /// <summary>
-        /// A command to validate the connection string and the availability 
-        /// of DB and initialize it, if necessary.
-        /// Called when the main window is loaded.
+        /// The command which is called when page is loaded and change value of IsExportAvailable property.
         /// </summary>
-        public RelayCommand InitializeDBCommand
+        public RelayCommand PageIsLoadedCommand
         {
             get
             {
-                return _initializeDBCommand ??
-                    (_initializeDBCommand = new RelayCommand(async obj =>
+                return _pageIsLoadedCommand ??
+                    (_pageIsLoadedCommand = new RelayCommand(obj =>
                     {
-                        try
-                        {
-                            var db = _repositoryFactory.Create();
-                            await db.InitializeDBAsync(db.ReturnConnectionStringValue());
-                        }
-                        catch(Exception ex)
-                        {
-                            var message = _messageFactory.Create();
-                            message.ShowMessage(ex.Message);
-
-                            Uri uri = new Uri("/View/Pages/EnterConnectionStringPage.xaml", UriKind.Relative);
-                            Page page = obj as Page;
-
-                            NavigationService navigationService = NavigationService.GetNavigationService(page);
-                            navigationService.Navigate(uri);
-                        }
+                        IsExportAvailable = !_repository.ReturnIsDBEmpty();
                     }
                     ));
             }
         }
 
+        /// <summary>
+        /// A property associated with an IsEnable property of View button.
+        /// </summary>
+        public bool IsViewingAvailable
+        {
+            get { return !_users.ReturnListOfUsersForView().IsNullOrEmpty(); }
+        }
 
+        private bool _isExportAvailable;
+        /// <summary>
+        /// A property associated with an IsEnable property of Export button.
+        /// </summary>
+        public bool IsExportAvailable
+        {
+            get { return _isExportAvailable; }
+            set
+            {
+                _isExportAvailable = value;
+                OnPropertyChanged(nameof(IsExportAvailable));
+            }
+        }
     }
 }

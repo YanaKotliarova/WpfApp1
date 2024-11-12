@@ -3,37 +3,50 @@
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      
+      xmlns:Controls="http://metro.mahapps.com/winfx/xaml/controls"
+      
       xmlns:local="clr-namespace:WpfApp1.View.Pages"
       xmlns:n="clr-namespace:WpfApp1"      
       mc:Ignorable="d" 
       
-      x:Name="Menu"
-      
+      x:Name="Menu"    
       xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
-      
+            
       d:DesignHeight="450" d:DesignWidth="800"
       Title="MenuPage">
 
-    <Grid Margin="5" Background="White">
+    <Page.Resources>
+        <Style x:Key="NavButtonStyle" TargetType="n:NavigationButton">
+            <Style.Triggers>
+                <Trigger Property="IsEnabled" Value="False">
+                    <Setter Property="Opacity" Value="0.5"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </Page.Resources>
 
-        <n:NavigationButton x:Name ="ImportButton" Text="Import" HorizontalAlignment="Left" VerticalAlignment="Top" MinHeight="70" MinWidth="60"
+    <Grid Background="White">
+
+        <n:NavigationButton x:Name ="ImportButton" Text="Импорт" HorizontalAlignment="Left" VerticalAlignment="Top" MinHeight="70" MinWidth="60"
                             Command="{Binding OpenPageCommand}" CommandParameter="{Binding ElementName=ImportButton}"
-                            ImageSource="/View/Images/Import.png" NavigationUri="/View/Pages/ImportPage.xaml"/>
-        <n:NavigationButton x:Name ="ExportButton" Text="Export" HorizontalAlignment="Left" VerticalAlignment="Top" MinHeight="70" MinWidth="60"
+                            ImageSource="/View/Images/Import.png" NavigationUri="/View/Pages/ImportPage.xaml" FontWeight="Bold"/>
+
+        <n:NavigationButton x:Name ="ExportButton" Text="Экспорт" HorizontalAlignment="Left" VerticalAlignment="Top" MinHeight="70" MinWidth="60"
                             Command="{Binding OpenPageCommand}" CommandParameter="{Binding ElementName=ExportButton}"
-                            ImageSource="/View/Images/Export.png" NavigationUri="/View/Pages/ExportPage.xaml" Margin="77,2,2,2"/>
-        <n:NavigationButton x:Name ="ViewButton" Text="View" HorizontalAlignment="Left" VerticalAlignment="Top" MinHeight="70" MinWidth="60"
+                            ImageSource="/View/Images/Export.png" NavigationUri="/View/Pages/ExportPage.xaml" Margin="77,2,2,2"
+                            IsEnabled="{Binding IsExportAvailable}" Style="{StaticResource NavButtonStyle}" FontWeight="Bold"/>
+
+        <n:NavigationButton x:Name ="ViewButton" Text="Просмотр" HorizontalAlignment="Left" VerticalAlignment="Top" MinHeight="70" MinWidth="60"
                             Command="{Binding OpenPageCommand}" CommandParameter="{Binding ElementName=ViewButton}"
-                            ImageSource="/View/Images/View.png" NavigationUri="/View/Pages/ViewingPage.xaml" Margin="154,2,2,2"/>
-
-        <i:Interaction.Triggers>
-            <i:EventTrigger EventName="Loaded">
-                <i:InvokeCommandAction Command="{Binding InitializeDBCommand}" CommandParameter="{Binding ElementName=Menu}"/>
-            </i:EventTrigger>
-        </i:Interaction.Triggers>
-
-
+                            ImageSource="/View/Images/View.png" NavigationUri="/View/Pages/ViewingPage.xaml" Margin="154,2,2,2" 
+                            IsEnabled="{Binding IsViewingAvailable}" Style="{StaticResource NavButtonStyle}" FontWeight="Bold"/>
     </Grid>
-    
-    
+
+    <i:Interaction.Triggers>
+        <i:EventTrigger EventName="Loaded">
+            <i:InvokeCommandAction Command="{Binding PageIsLoadedCommand}"/>
+        </i:EventTrigger>
+    </i:Interaction.Triggers>
+
 </Page>

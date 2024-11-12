@@ -12,16 +12,17 @@ namespace WpfApp1.Data.Database
         public bool ValidateConnectionString(string connectionString)
         {
             try
-            {
-                using (var connection = new SqlConnection(connectionString))
+            {                
+                using (SqlConnection connection = new SqlConnection(connectionString))
                 {
                     connection.Open();
                 }
                 return true;
             }
-            catch (SqlException)
+            catch(SqlException ex)
             {
-                return true;
+                if (ex.Number == 4060) return true;
+                return false;
             }
             catch (Exception)
             {

@@ -47,11 +47,11 @@ namespace WpfApp1.Services.Export
         /// received from the database into an Excel file.
         /// </summary>
         /// <param name="excelFileName"> Name of Excel file.</param>
-        /// <param name="ListOfUsersFromDB"> List of users for recording. </param>
+        /// <param name="listOfUsersFromDB"> List of users for recording. </param>
         /// <returns></returns>
-        public async Task AddToFileAsync(string excelFileName, List<User> ListOfUsersFromDB)
+        public async Task AddToFileAsync(string excelFileName, List<User> listOfUsersFromDB)
         {
-            if (ListOfUsersFromDB.IsNullOrEmpty())
+            if (listOfUsersFromDB.IsNullOrEmpty())
                 throw new Exception("Выборка не была осуществена!\r\nПроверьте введённые данные.");
 
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
@@ -65,7 +65,7 @@ namespace WpfApp1.Services.Export
                 List<string[]> dataForFile = new List<string[]>();
                 string[] cellData;
 
-                foreach (User user in ListOfUsersFromDB)
+                foreach (User user in listOfUsersFromDB)
                 {
                     cellData = new string[7] { user.Id.ToString(), user.Date.ToString(), user.FirstName, user.LastName, user.Patronymic,
                             user.City, user.Country};
@@ -74,10 +74,9 @@ namespace WpfApp1.Services.Export
 
                 worksheet.Cells[rows + 1, 1].LoadFromArrays(dataForFile);
 
-
                 await excelPackage.SaveAsync();
             }
-            ListOfUsersFromDB.Clear();
+            listOfUsersFromDB.Clear();
         }
 
     }

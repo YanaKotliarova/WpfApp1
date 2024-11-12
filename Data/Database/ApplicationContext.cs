@@ -11,10 +11,19 @@ namespace WpfApp1.Data.Database
 
         private string _connectionString = ConfigurationManager.ConnectionStrings[DefaultConnection].ConnectionString;
 
+        /// <summary>
+        /// The method for returning value of connection string.
+        /// </summary>
+        /// <returns></returns>
         internal string ReturnConnectionString()
         {
             return _connectionString;
         }
+
+        /// <summary>
+        /// The method for setting value of connection string.
+        /// </summary>
+        /// <param name="connectionString"></param>
         internal void SetConnectionString(string connectionString)
         {
             _connectionString = connectionString;

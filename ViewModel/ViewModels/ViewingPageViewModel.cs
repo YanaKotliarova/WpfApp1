@@ -1,22 +1,19 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using Microsoft.IdentityModel.Tokens;
+﻿using Microsoft.IdentityModel.Tokens;
 using WpfApp1.Model;
 using WpfApp1.Model.Interfaces;
 using WpfApp1.MVVM;
-using WpfApp1.ViewModel.DependencyInjection;
-using WpfApp1.ViewModel.Factories.Interfaces;
 
 namespace WpfApp1.ViewModel.ViewModels
 {
     class ViewingPageViewModel : ViewModelBase
     {
-        private readonly IAbstractFactory<IUsers> _usersFactory;
-        public ViewingPageViewModel(DependencyStruct dependencyStruct)
-        {
-            _usersFactory = dependencyStruct.Users;
-        }
-
         private const string Space = " ";
+
+        private readonly IUsers _users;
+        public ViewingPageViewModel(IUsers users)
+        {
+            _users = users;
+        }        
 
         private string _viewTextBoxText;
         /// <summary>
@@ -43,8 +40,7 @@ namespace WpfApp1.ViewModel.ViewModels
                 return _showSelectionCommand ??
                     (_showSelectionCommand = new RelayCommand(obj =>
                     {
-                        var users = _usersFactory.Create();
-                        OutputUsersToTextbox(users.ReturnListOfUsersFromFile());
+                        OutputUsersToTextbox(_users.ReturnListOfUsersForView());
                     }
                     ));
             }
@@ -53,16 +49,21 @@ namespace WpfApp1.ViewModel.ViewModels
         /// <summary>
         /// The method for displaying the created selection in the text field.
         /// </summary>
-        /// <param name="ListOfUsersFromFile"> List of users who were put into selection from DB. </param>
-        internal void OutputUsersToTextbox(List<User> ListOfUsersFromFile)
+        /// <param name="listOfUsersForView"> List of users who were put into selection from DB. </param>
+        internal void OutputUsersToTextbox(List<User> listOfUsersForView)
         {
-            if (!ListOfUsersFromFile.IsNullOrEmpty())
+            if (!listOfUsersForView.IsNullOrEmpty())
             {
-                ViewText = "Созданная выборка:\r\n";
-                foreach (User u in ListOfUsersFromFile)
+                ViewText = "";
+                if (listOfUsersForView.Count == 1000)
+                    ViewText += "В данном окне будет показана только первая 1000 результатов запроса. " +
+                        "Полную выборку можно увидеть в созданном файле.\r\n";
+
+                ViewText += "Созданная выборка:\r\n";
+                foreach (User u in listOfUsersForView)
                     ViewText += u.Date.ToString() + Space + u.FirstName + Space + u.LastName + Space
                             + u.Patronymic + Space + u.City + Space + u.Country + "\r\n";
-                ListOfUsersFromFile.Clear();
+                listOfUsersForView.Clear();
             }
             else ViewText = "Выборка не была создана!";
         }

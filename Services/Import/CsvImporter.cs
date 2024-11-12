@@ -6,16 +6,18 @@ namespace WpfApp1.Services.Import
     internal class CsvImporter : IDataImporter
     {
         private const string Semicolon = ";";
+        private const int AmountOfUsersToRead = 1000;
 
         /// <summary>
         /// Asynchronous method of reading data from a CSV file.
         /// </summary>
-        /// <param name="fileName"> Name of file for reading. </param>
+        /// <param name="fileName"> Path to file for reading. </param>
         /// <returns></returns>
-        public async Task ReadFromFileAsync(string fileName, List<User> ListOfUsersFromFile)
+        public async IAsyncEnumerable<List<User>> ReadFromFileAsync(string fileName)
         {
             using (StreamReader streamReader = new StreamReader(fileName))
             {
+                List<User> listOfUsersFromFile = new List<User>();
                 string stringFromFile;
                 string[] dataFromString = new string[5];
                 User newUser;
@@ -28,7 +30,13 @@ namespace WpfApp1.Services.Import
 
                     newUser = new User(person, entranceInfo);
 
-                    ListOfUsersFromFile.Add(newUser);
+                    listOfUsersFromFile.Add(newUser);
+
+                    if (listOfUsersFromFile.Count >= AmountOfUsersToRead || streamReader.EndOfStream)
+                    {
+                        yield return listOfUsersFromFile;
+                        listOfUsersFromFile.Clear();
+                    }
                 }
             }
         }

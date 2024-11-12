@@ -9,8 +9,7 @@
       
       mc:Ignorable="d" 
       d:DesignHeight="450" d:DesignWidth="800"
-      Title="ViewingPage"
-      >
+      Title="ViewingPage">
 
     <Grid Background="White">
         <Grid.RowDefinitions>
@@ -24,19 +23,16 @@
         HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,10,0,0"/>
 
         <TextBox x:Name="importTextBox" Grid.Column="0" Grid.Row="1"
-         TextWrapping="Wrap" AcceptsReturn="True" 
-         MinHeight="300" MinWidth="600"
-         VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Auto" ScrollViewer.CanContentScroll="True"
-         IsReadOnly="True" Text = "{Binding ViewText, UpdateSourceTrigger =PropertyChanged}" 
-         HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" 
-         HorizontalAlignment="Center" VerticalAlignment="Top"
-         />
-
-        <i:Interaction.Triggers>
-            <i:EventTrigger EventName="Loaded">
-                <i:InvokeCommandAction Command="{Binding ShowSelectionCommand}" />
-            </i:EventTrigger>
-        </i:Interaction.Triggers>
-
+                 TextWrapping="Wrap" AcceptsReturn="True"
+                 VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" ScrollViewer.CanContentScroll="True"
+                 IsReadOnly="True" Text = "{Binding ViewText, UpdateSourceTrigger = PropertyChanged}" BorderThickness="2,2,2,2"
+                 VerticalContentAlignment="Stretch" HorizontalContentAlignment="Stretch" Margin="100,0,100,40"/>
     </Grid>
+    
+    <i:Interaction.Triggers>
+        <i:EventTrigger EventName="Loaded">
+            <i:InvokeCommandAction Command="{Binding ShowSelectionCommand}" />
+        </i:EventTrigger>
+    </i:Interaction.Triggers>
+
 </Page>

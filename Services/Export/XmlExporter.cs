@@ -38,11 +38,11 @@ namespace WpfApp1.Services.Export
         /// received from the database into an Xml file.
         /// </summary>
         /// <param name="xmlFileName"> Name of Xml file. </param>
-        /// <param name="ListOfUsersFromDB"> List of users for recording. </param>
+        /// <param name="listOfUsersFromDB"> List of users for recording. </param>
         /// <returns></returns>
-        public async Task AddToFileAsync(string xmlFileName, List<User> ListOfUsersFromDB)
+        public async Task AddToFileAsync(string xmlFileName, List<User> listOfUsersFromDB)
         {
-            if (ListOfUsersFromDB.IsNullOrEmpty())
+            if (listOfUsersFromDB.IsNullOrEmpty())
                 throw new Exception("Выборка не была осуществена!\r\nПроверьте введённые данные.");
 
 
@@ -51,7 +51,7 @@ namespace WpfApp1.Services.Export
 
             if (root != null)
             {
-                foreach (User user in ListOfUsersFromDB)
+                foreach (User user in listOfUsersFromDB)
                 {
                     XElement newUser = new XElement(UserWord + user.Id.ToString());
                     XElement newUserDate = new XElement(DateWord, user.Date);
@@ -65,7 +65,7 @@ namespace WpfApp1.Services.Export
                     root.Add(newUser);
                 }
                 await Task.Factory.StartNew(() => xDoc.Save(xmlFileName));
-                ListOfUsersFromDB.Clear();
+                listOfUsersFromDB.Clear();
             }
         }
     }
