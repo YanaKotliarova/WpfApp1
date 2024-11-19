@@ -31,7 +31,9 @@ namespace WpfApp1.Services.Export
             {
                 excelPackage.Workbook.Worksheets.Add(WorksheetWord);
 
-                var headerRow = new List<string[]>() { new string[] { IdWord, DateWord, FirstNameWord, LastNameWord, PatronymicWord, CityWord, CountryWord } };
+                var headerRow = new List<string[]>() { new string[] 
+                { IdWord, DateWord, FirstNameWord, LastNameWord, PatronymicWord, CityWord, CountryWord } };
+
                 string headerRange = "A1:" + char.ConvertFromUtf32(headerRow[0].Length + 64) + "1";
                 var worksheet = excelPackage.Workbook.Worksheets[WorksheetWord];
                 worksheet.Cells[headerRange].LoadFromArrays(headerRow);
@@ -62,17 +64,20 @@ namespace WpfApp1.Services.Export
 
                 int rows = worksheet.Dimension.Rows;
 
-                List<string[]> dataForFile = new List<string[]>();
-                string[] cellData;
+                worksheet.Column(2).Style.Numberformat.Format = "dd/mm/yyyy";
+
+                List<Object[]> dataForFile = new List<Object[]>();
+                Object[] cellData;
 
                 foreach (User user in listOfUsersFromDB)
                 {
-                    cellData = new string[7] { user.Id.ToString(), user.Date.ToString(), user.FirstName, user.LastName, user.Patronymic,
-                            user.City, user.Country};
+                    cellData = [user.Id, user.Date, user.FirstName, user.LastName, user.Patronymic, user.City, user.Country];
                     dataForFile.Add(cellData);
                 }
 
                 worksheet.Cells[rows + 1, 1].LoadFromArrays(dataForFile);
+
+                worksheet.Columns.AutoFit();
 
                 await excelPackage.SaveAsync();
             }

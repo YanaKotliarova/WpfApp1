@@ -44,7 +44,7 @@ namespace WpfApp1.ViewModel.ViewModels
                             }
                             catch (Exception ex)
                             {
-                                await _metroDialog.MetroDialogMessage(this, "При подключении возникла ошибка", ex.Message);
+                                await _metroDialog.ShowMessage(this, "При подключении возникла ошибка", ex.Message);
                                 uri = new Uri(EnterConnectionStringPageUri, UriKind.Relative);
                             }
                         });

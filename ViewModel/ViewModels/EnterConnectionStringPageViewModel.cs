@@ -39,7 +39,7 @@ namespace WpfApp1.ViewModel.ViewModels
 
                             await Task.Run(() => _repository.InitializeDBAsync(NewConnectionStringTextBox));
 
-                            await _metroDialog.MetroDialogMessage(this, "Подключение установлено", "Подключение к БД завершено успешно");
+                            await _metroDialog.ShowMessage(this, "Подключение установлено", "Подключение к БД завершено успешно");
 
                             Uri uri = new Uri(MenuPageUri, UriKind.Relative);
                             Page page = obj as Page;
@@ -49,7 +49,7 @@ namespace WpfApp1.ViewModel.ViewModels
                         }
                         catch (Exception ex)
                         {
-                            await _metroDialog.MetroDialogMessage(this, "Попробуйте снова.", ex.Message);
+                            await _metroDialog.ShowMessage(this, "Попробуйте снова.", ex.Message);
                             DisplayProgressBar = false;
                             DisplayEnterButton = true;
                             IsTextBoxAvailable = true;

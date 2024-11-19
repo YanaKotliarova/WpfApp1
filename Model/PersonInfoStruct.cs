@@ -1,12 +1,12 @@
 ﻿namespace WpfApp1.Model
 {
-    internal struct PersonStruct
+    internal struct PersonInfoStruct
     {
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public string Patronymic { get; set; }
 
-        public PersonStruct(string firstName, string lastName, string patronymic)
+        public PersonInfoStruct(string firstName, string lastName, string patronymic)
         {
             FirstName = firstName;
             LastName = lastName;

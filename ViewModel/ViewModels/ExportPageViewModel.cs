@@ -1,7 +1,6 @@
 ﻿using System.IO;
 using WpfApp1.Data.Database.Interfaces;
 using WpfApp1.Model;
-using WpfApp1.Model.Interfaces;
 using WpfApp1.MVVM;
 using WpfApp1.View.UI.Interfaces;
 using WpfApp1.ViewModel.Factories.Interfaces;
@@ -23,20 +22,16 @@ namespace WpfApp1.ViewModel.ViewModels
         private readonly IDataFormatter _dataFormatter;
         private readonly IFileDialog _fileDialog;
         private readonly IMetroDialog _metroDialog;
-        private readonly IUsers _users;
 
         public ExportPageViewModel(IExporterFactory exporter, IRepository<User> repository, IDataFormatter dataFormatter,
-            IFileDialog fileDialog, IMetroDialog metroDialog, IUsers users)
+            IFileDialog fileDialog, IMetroDialog metroDialog)
         {
             _exporter = exporter;
             _repository = repository;
             _dataFormatter = dataFormatter;
             _fileDialog = fileDialog;
             _metroDialog = metroDialog;
-            _users = users;
         }
-
-        private string _fileExtension = "";
 
         private string _exportTextBoxText;
         /// <summary>
@@ -65,6 +60,8 @@ namespace WpfApp1.ViewModel.ViewModels
                     (_pageIsLoadedCommand = new RelayCommand(obj =>
                     {
                         ExportText = DefaultExportTextBoxMessage;
+                        DisplayProgressBar = !_repository.IsDBAvailable;
+                        IsExportAvailable = _repository.IsDBAvailable;
                     }));
             }
         }
@@ -89,13 +86,11 @@ namespace WpfApp1.ViewModel.ViewModels
                         {
                             if (_fileDialog.SaveFileDialog(out string newFileName))
                             {
-                                IsExportAvailable = true;
-                                _fileExtension = Path.GetExtension(newFileName);
-
                                 ExportText = "Экспорт может занять некоторое время, пожалуйста подождите...";
 
                                 DisplayProgressBar = true;
                                 IsExportAvailable = false;
+                                _repository.IsDBAvailable = false;
 
                                 string date = _dataFormatter.FormateDate(DatePicker);
                                 DatePicker = null;
@@ -115,53 +110,41 @@ namespace WpfApp1.ViewModel.ViewModels
                                 string country = _dataFormatter.FormateStringData(CountryTextBox);
                                 CountryTextBox = "";
 
-                                PersonStruct person = new PersonStruct(firstName, lastName, patronymic);
+                                PersonInfoStruct person = new PersonInfoStruct(firstName, lastName, patronymic);
                                 EntranceInfoStruct entranceInfo = new EntranceInfoStruct(date, city, country);
-
-                                _users.ReturnListOfUsersForView().Clear();
-
-                                int amountOfUsersInDB = 0;
-
-                                amountOfUsersInDB = await _repository.ReturnAmountOfUsersInDBAsync();
 
                                 await CreateFileAsync(newFileName);
                                 await Task.Run(async () =>
                                 {
-                                    await foreach (List<User> list in _repository.GetSelectionFromDBAsync(person, entranceInfo))
+                                    await foreach (List<User> listOfUsers in _repository.GetSelectionFromDBAsync(person, entranceInfo))
                                     {
-                                        _users.SetListOfUsersFromDB(list);
+                                        if (listOfUsers.Count > 0) 
+                                            await AddToFileAsync(newFileName, listOfUsers);                                       
 
-                                        if (_users.ReturnListOfUsersFromDB().Count > 0)
-                                        {
-                                            if (_users.ReturnListOfUsersForView().Count() < 1000)
-                                                _users.ReturnListOfUsersForView().AddRange(_users.ReturnListOfUsersFromDB());
-                                            await AddToFileAsync(newFileName, _users.ReturnListOfUsersFromDB());
-                                        }
-
-                                        _users.ReturnListOfUsersFromDB().Clear();
+                                        listOfUsers.Clear();
                                     }
                                 });
 
                                 DisplayProgressBar = false;
                                 IsExportAvailable = true;
+                                _repository.IsDBAvailable = true;
 
-                                await _metroDialog.MetroDialogMessage(this, "Успешное создание файла", "Файл " + newFileName + " создан!");
-                                _repository.SetAmountOfViewedUsers(0);
                                 ExportText = $"Созданную выборку можно увидеть в созданном файле: \"{newFileName}\" " +
                                 $"либо на вкладке \"Просмотр\"";
                             }
                         }
                         catch (Exception ex)
                         {
-                            await _metroDialog.MetroDialogMessage(this, "При создании файла произошла ошибка", ex.Message);
+                            await _metroDialog.ShowMessage(this, "При создании файла произошла ошибка", ex.Message);
                             DisplayProgressBar = false;
                             IsExportAvailable = true;
+                            _repository.IsDBAvailable = true;
                         }
                     }));
             }
         }
 
-        private bool _displayProgressBar = false;
+        private bool _displayProgressBar;
         /// <summary>
         /// A property associated with an IsVisible property of progress bar.
         /// </summary>
@@ -175,7 +158,7 @@ namespace WpfApp1.ViewModel.ViewModels
             }
         }
 
-        private bool _isExportAvailable = true;
+        private bool _isExportAvailable;
         /// <summary>
         /// A property associated with an IsEnable property of export button.
         /// </summary>
@@ -196,12 +179,12 @@ namespace WpfApp1.ViewModel.ViewModels
         /// <returns></returns>
         private async Task CreateFileAsync(string newFileName)
         {
-            if (_fileExtension.Equals(ExcelExtension))
+            if (Path.GetExtension(newFileName).Equals(ExcelExtension))
             {
                 var fileExporter = _exporter.GetExporter(ExcelExporterName);
                 await fileExporter.CreateFileAsync(newFileName);
             }
-            else if (_fileExtension.Equals(XmlExtension))
+            else if (Path.GetExtension(newFileName).Equals(XmlExtension))
             {
                 var fileExporter = _exporter.GetExporter(XmlExporterName);
                 await fileExporter.CreateFileAsync(newFileName);
@@ -221,12 +204,12 @@ namespace WpfApp1.ViewModel.ViewModels
         /// <returns></returns>
         private async Task AddToFileAsync(string newFileName, List<User> listOfUsersFromDB)
         {
-            if (_fileExtension.Equals(ExcelExtension))
+            if (Path.GetExtension(newFileName).Equals(ExcelExtension))
             {
                 var fileExporter = _exporter.GetExporter(ExcelExporterName);
                 await fileExporter.AddToFileAsync(newFileName, listOfUsersFromDB);
             }
-            else if (_fileExtension.Equals(XmlExtension))
+            else if (Path.GetExtension(newFileName).Equals(XmlExtension))
             {
                 var fileExporter = _exporter.GetExporter(XmlExporterName);
                 await fileExporter.AddToFileAsync(newFileName, listOfUsersFromDB);
@@ -294,7 +277,7 @@ namespace WpfApp1.ViewModel.ViewModels
                 }
                 catch (Exception ex)
                 {
-                    _metroDialog.MetroDialogMessage(this, "Неверный ввод", ex.Message);
+                    _metroDialog.ShowMessage(this, "Неверный ввод", ex.Message);
                 }
 
             }
@@ -319,7 +302,7 @@ namespace WpfApp1.ViewModel.ViewModels
                 }
                 catch (Exception ex)
                 {
-                    _metroDialog.MetroDialogMessage(this, "Неверный ввод", ex.Message);
+                    _metroDialog.ShowMessage(this, "Неверный ввод", ex.Message);
                 }
             }
         }
@@ -343,7 +326,7 @@ namespace WpfApp1.ViewModel.ViewModels
                 }
                 catch (Exception ex)
                 {
-                    _metroDialog.MetroDialogMessage(this, "Неверный ввод", ex.Message);
+                    _metroDialog.ShowMessage(this, "Неверный ввод", ex.Message);
                 }
             }
         }
@@ -367,7 +350,7 @@ namespace WpfApp1.ViewModel.ViewModels
                 }
                 catch (Exception ex)
                 {
-                    _metroDialog.MetroDialogMessage(this, "Неверный ввод", ex.Message);
+                    _metroDialog.ShowMessage(this, "Неверный ввод", ex.Message);
                 }
             }
         }
@@ -391,7 +374,7 @@ namespace WpfApp1.ViewModel.ViewModels
                 }
                 catch (Exception ex)
                 {
-                    _metroDialog.MetroDialogMessage(this, "Неверный ввод", ex.Message);
+                    _metroDialog.ShowMessage(this, "Неверный ввод", ex.Message);
                 }
             }
         }

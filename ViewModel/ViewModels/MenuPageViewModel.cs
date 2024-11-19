@@ -1,8 +1,6 @@
-﻿using Microsoft.IdentityModel.Tokens;
-using System.Windows.Navigation;
+﻿using System.Windows.Navigation;
 using WpfApp1.Data.Database.Interfaces;
 using WpfApp1.Model;
-using WpfApp1.Model.Interfaces;
 using WpfApp1.MVVM;
 using WpfApp1.View.UI.Interfaces;
 
@@ -12,16 +10,12 @@ namespace WpfApp1.ViewModel.ViewModels
     {      
         private readonly IRepository<User> _repository;
         private readonly IMetroDialog _metroDialog;
-        private readonly IUsers _users;
 
-        public MenuPageViewModel(IRepository<User> repository, IMetroDialog metroDialog, IUsers users)
+        public MenuPageViewModel(IRepository<User> repository, IMetroDialog metroDialog)
         {
             _repository = repository;
             _metroDialog = metroDialog;
-            _users = users;
         }
-
-        private int _amountOfUsersInDB = 0;
 
         private RelayCommand _openPageCommand;
         /// <summary>
@@ -45,7 +39,7 @@ namespace WpfApp1.ViewModel.ViewModels
                         }
                         catch (Exception ex)
                         {
-                            await _metroDialog.MetroDialogMessage(this, "Ошибка при переходе на страницу", ex.Message);
+                            await _metroDialog.ShowMessage(this, "Ошибка при переходе на страницу", ex.Message);
                         }
                     }
                     ));
@@ -63,7 +57,7 @@ namespace WpfApp1.ViewModel.ViewModels
                 return _pageIsLoadedCommand ??
                     (_pageIsLoadedCommand = new RelayCommand(obj =>
                     {
-                        IsExportAvailable = !_repository.ReturnIsDBEmpty();
+                        IsExportAvailable = !_repository.IsDBEmpty;
                     }
                     ));
             }
@@ -74,7 +68,7 @@ namespace WpfApp1.ViewModel.ViewModels
         /// </summary>
         public bool IsViewingAvailable
         {
-            get { return !_users.ReturnListOfUsersForView().IsNullOrEmpty(); }
+            get { return /*!_users.ReturnListOfUsersForView().IsNullOrEmpty();*/ true; }
         }
 
         private bool _isExportAvailable;

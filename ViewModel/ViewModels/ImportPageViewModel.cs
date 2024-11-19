@@ -1,6 +1,5 @@
 ﻿using WpfApp1.Data.Database.Interfaces;
 using WpfApp1.Model;
-using WpfApp1.Model.Interfaces;
 using WpfApp1.MVVM;
 using WpfApp1.Services.Import;
 using WpfApp1.View.UI.Interfaces;
@@ -13,19 +12,34 @@ namespace WpfApp1.ViewModel.ViewModels
         private readonly IRepository<User> _repository;
         private readonly IFileDialog _fileDialog;
         private readonly IMetroDialog _metroDialog;
-        private readonly IUsers _users;
 
         public ImportPageViewModel(IDataImporter importer, IRepository<User> repository, IFileDialog fileDialog,
-            IMetroDialog metroDialog, IUsers users)
+            IMetroDialog metroDialog)
         {
             _importer = importer;
             _repository = repository;
             _fileDialog = fileDialog;
             _metroDialog = metroDialog;
-            _users = users;
         }
 
-        private string _importTextBoxText = "Выберите, пожалуйста, файл!\t\t\t\t\t\t\t--------->\r\n(в формате csv)";
+        private RelayCommand _pageIsLoadedCommand;
+        /// <summary>
+        /// The command which is called when page is loaded and change text of main text box on export page.
+        /// </summary>
+        public RelayCommand PageIsLoadedCommand
+        {
+            get
+            {
+                return _pageIsLoadedCommand ??
+                    (_pageIsLoadedCommand = new RelayCommand(obj =>
+                    {
+                        DisplayProgressBar = !_repository.IsDBAvailable;
+                        IsImportAvailable = _repository.IsDBAvailable;
+                    }));
+            }
+        }
+
+        private string _importTextBoxText = "Выберите, пожалуйста, файл для импорта.";
         /// <summary>
         /// A property associated with the text field used to display information.
         /// </summary>
@@ -57,40 +71,39 @@ namespace WpfApp1.ViewModel.ViewModels
                             {
                                 IsImportAvailable = false;
                                 DisplayProgressBar = true;
+                                _repository.IsDBAvailable = false;
 
                                 ImportText = "Открытие файла и перенос данных могут занять некоторое время...";
 
                                 await Task.Run(async () =>
                                 {
-                                    await foreach (List<User> list in _importer.ReadFromFileAsync(fileName))
+                                    await foreach (List<User> listOfUsers in _importer.ReadFromFileAsync(fileName))
                                     {
-                                        _users.SetListOfUsersFromFile(list);
-                                        await _repository.AddToDBAsync(_users.ReturnListOfUsersFromFile());
-                                        _users.ReturnListOfUsersFromFile().Clear();
+                                        await _repository.AddToDBAsync(listOfUsers);
+                                        listOfUsers.Clear();
                                     }
                                 });
 
-                                await _metroDialog.MetroDialogMessage(this, "Данные успешно перенесены", "Можете перейти на страницу экспорта");
-
                                 DisplayProgressBar = false;
                                 IsImportAvailable = true;
+                                _repository.IsDBAvailable = true;
 
                                 ImportText = "Данные загружены в базу даных и готовы к экспорту.";
                             }
                         }
                         catch (Exception ex)
                         {
-                            await _metroDialog.MetroDialogMessage(this, "Ошибка", ex.Message);
+                            await _metroDialog.ShowMessage(this, "Ошибка", ex.Message);
                             DisplayProgressBar = false;
                             IsImportAvailable = true;
+                            _repository.IsDBAvailable = true;
                         }
-
                     }
                     ));
-            }
+        }
         }
 
-        private bool _displayProgressBar = false;
+        private bool _displayProgressBar;
         /// <summary>
         /// A property associated with an IsVisible property of progress bar.
         /// </summary>
@@ -104,7 +117,7 @@ namespace WpfApp1.ViewModel.ViewModels
             }
         }
 
-        private bool _isImportAvailable = true;
+        private bool _isImportAvailable;
         /// <summary>
         /// A property associated with an IsEnable property of import button.
         /// </summary>

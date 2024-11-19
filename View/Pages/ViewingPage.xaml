@@ -17,21 +17,29 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <Button Content="Back" Grid.Column="0" Grid.Row="0"
-        Command="NavigationCommands.BrowseBack" 
-        Padding="3" MinHeight="25" MinWidth="35"
-        HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,10,0,0"/>
+        <Button Content="Назад" Grid.Row="0"
+                Command="NavigationCommands.BrowseBack" 
+                Padding="3" MinHeight="25" MinWidth="35"
+                HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,10,0,0"/>
 
-        <TextBox x:Name="importTextBox" Grid.Column="0" Grid.Row="1"
-                 TextWrapping="Wrap" AcceptsReturn="True"
-                 VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" ScrollViewer.CanContentScroll="True"
-                 IsReadOnly="True" Text = "{Binding ViewText, UpdateSourceTrigger = PropertyChanged}" BorderThickness="2,2,2,2"
-                 VerticalContentAlignment="Stretch" HorizontalContentAlignment="Stretch" Margin="100,0,100,40"/>
+        <ListView Language="ru-RU" Name="ListViewForUsers" Grid.Row="1" Margin="40,0,40,50" 
+                  ScrollViewer.CanContentScroll="True" BorderThickness="2,2,2,2">
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn Header="Дата" DisplayMemberBinding="{Binding Path=Date}" Width="100"/>
+                    <GridViewColumn Header="Имя" DisplayMemberBinding="{Binding Path=FirstName}" Width="100"/>
+                    <GridViewColumn Header="Фамилия" DisplayMemberBinding="{Binding Path=LastName}" Width="100"/>
+                    <GridViewColumn Header="Отчество" DisplayMemberBinding="{Binding Path=Patronymic}" Width="100"/>
+                    <GridViewColumn Header="Город" DisplayMemberBinding="{Binding Path=City}" Width="100"/>
+                    <GridViewColumn Header="Страна" DisplayMemberBinding="{Binding Path=Country}" Width="100"/>
+                </GridView>
+            </ListView.View>
+        </ListView>
     </Grid>
-    
+
     <i:Interaction.Triggers>
         <i:EventTrigger EventName="Loaded">
-            <i:InvokeCommandAction Command="{Binding ShowSelectionCommand}" />
+            <i:InvokeCommandAction Command="{Binding ShowSelectionCommand}" CommandParameter="{Binding ElementName=ListViewForUsers}" />
         </i:EventTrigger>
     </i:Interaction.Triggers>
 

@@ -4,6 +4,7 @@
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       
+      xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
       xmlns:Controls="http://metro.mahapps.com/winfx/xaml/controls"
       xmlns:Dialog="clr-namespace:MahApps.Metro.Controls.Dialogs;assembly=MahApps.Metro"
       Dialog:DialogParticipation.Register="{Binding}"
@@ -29,8 +30,7 @@
             <ColumnDefinition Width="100"/>
         </Grid.ColumnDefinitions>
 
-        <Button Content="Back" Grid.Column="0" Grid.Row="0"
-                IsEnabled="{Binding IsImportAvailable}"
+        <Button Content="Назад" Grid.Column="0" Grid.Row="0"
                 Command="NavigationCommands.BrowseBack" Padding="3" MinHeight="25" MinWidth="35"
                 HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,10,0,0"/>
 
@@ -42,7 +42,7 @@
         <Button x:Name="buttonChooseFile" Content="Открыть"  
                 Grid.Column="1" Grid.Row="1"
                 Command="{Binding ReadCsvFileAndAddToBDCommand}"
-                IsEnabled="{Binding IsImportAvailable}"
+                IsEnabled="{Binding Path=IsImportAvailable, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"
                 VerticalAlignment="Top" HorizontalAlignment="Left" 
                 MinHeight="25" MinWidth="65"
                 HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
@@ -53,4 +53,11 @@
            Visibility="{Binding DisplayProgressBar, Converter={StaticResource boolToVisibilityConverter}}" 
            EllipseDiameter="7" EllipseOffset="10"/>
     </Grid>
+
+    <i:Interaction.Triggers>
+        <i:EventTrigger EventName="Loaded">
+            <i:InvokeCommandAction Command="{Binding PageIsLoadedCommand}"/>
+        </i:EventTrigger>
+    </i:Interaction.Triggers>
+
 </Page>

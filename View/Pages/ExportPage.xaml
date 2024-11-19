@@ -4,12 +4,12 @@
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       
-      xmlns:Controls="http://metro.mahapps.com/winfx/xaml/controls"
       xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
+      xmlns:Controls="http://metro.mahapps.com/winfx/xaml/controls"
       xmlns:Dialog="clr-namespace:MahApps.Metro.Controls.Dialogs;assembly=MahApps.Metro"
       Dialog:DialogParticipation.Register="{Binding}"
-      
-      xmlns:local="clr-namespace:WpfApp1.View.Pages"
+     
+      xmlns:local="clr-namespace:WpfApp1.View.Pages" 
       mc:Ignorable="d" 
       d:DesignHeight="450" d:DesignWidth="800"
       Title="Export">
@@ -32,8 +32,7 @@
             <ColumnDefinition Width="0.3*"/>
         </Grid.ColumnDefinitions>
 
-        <Button Content="Back" Grid.Column="0" Grid.Row="0"
-                IsEnabled="{Binding IsExportAvailable}"
+        <Button Content="Назад" Grid.Column="0" Grid.Row="0"
                 Command="NavigationCommands.BrowseBack" Padding="3" MinHeight="25" MinWidth="35"
                 HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,10,0,0"/>
 

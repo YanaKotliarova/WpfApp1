@@ -22,7 +22,7 @@ namespace WpfApp1.Model
         /// </summary>
         /// <param name="person"> A structure that stores the user's first name, last name, and patronymic. </param>
         /// <param name="entranceInfo"> A structure that stores information about the user's entrance date, city, and country. </param>
-        public User(PersonStruct person, EntranceInfoStruct entranceInfo)
+        public User(PersonInfoStruct person, EntranceInfoStruct entranceInfo)
         {
             Date = DateOnly.Parse(entranceInfo.DateOfEntrance);
             FirstName = person.FirstName;

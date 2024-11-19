@@ -2,11 +2,11 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net8.0-windows7.0</TargetFramework>
+    <TargetFramework>net8.0-windows10.0.17763.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
-    <SupportedOSPlatformVersion>7.0</SupportedOSPlatformVersion>
+    <SupportedOSPlatformVersion>10.0.17763.0</SupportedOSPlatformVersion>
     <StartupObject>WpfApp1.App</StartupObject>
   </PropertyGroup>
 
@@ -15,10 +15,20 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ApplicationDefinition Remove="App.xaml" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Remove="View\Images\Export.png" />
     <None Remove="View\Images\Import.png" />
     <None Remove="View\Images\SplashScreen.jpg" />
     <None Remove="View\Images\View.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="App.xaml">
+      <CopyToOutputDirectory></CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
   <ItemGroup>
@@ -49,12 +59,6 @@
     <Resource Include="View\Images\SplashScreen.jpg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
-  </ItemGroup>
-
-  <ItemGroup>
-    <ApplicationDefinition Update="App.xaml">
-      <CopyToOutputDirectory></CopyToOutputDirectory>
-    </ApplicationDefinition>
   </ItemGroup>
 
   <ItemGroup>

@@ -1,11 +1,9 @@
-﻿using ControlzEx.Theming;
-using MahApps.Metro.Controls.Dialogs;
+﻿using MahApps.Metro.Controls.Dialogs;
 using Microsoft.Extensions.DependencyInjection;
 using System.Windows;
 using WpfApp1.Data.Database;
 using WpfApp1.Data.Database.Interfaces;
 using WpfApp1.Model;
-using WpfApp1.Model.Interfaces;
 using WpfApp1.Services.Import;
 using WpfApp1.View.UI;
 using WpfApp1.View.UI.Interfaces;
@@ -16,8 +14,7 @@ namespace WpfApp1
 {
     public partial class App : Application
     {
-        public static ServiceCollection services;
-        public static ServiceProvider serviceProvider;
+        internal static ServiceProvider serviceProvider;
 
         public ResourceDictionary MetroResources
         {
@@ -43,7 +40,7 @@ namespace WpfApp1
         [STAThread]
         public static void Main()
         {
-            services = new ServiceCollection();
+            ServiceCollection services = new ServiceCollection();
 
             services.AddSingleton<MainWindowViewModel>();
             services.AddSingleton<ExportPageViewModel>();
@@ -58,7 +55,6 @@ namespace WpfApp1
             services.AddTransient<IDataFormatter, DataFormatter>();
             services.AddTransient<IConnectionStringValidation, ConnectionStringValidation>();
             services.AddTransient<IFileDialog, FileDialog>();
-            services.AddScoped<IUsers, Users>();
             services.AddTransient<IDialogCoordinator, DialogCoordinator>();
             services.AddTransient<IMetroDialog, MetroDialog>();
 

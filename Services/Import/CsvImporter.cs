@@ -18,6 +18,8 @@ namespace WpfApp1.Services.Import
             using (StreamReader streamReader = new StreamReader(fileName))
             {
                 List<User> listOfUsersFromFile = new List<User>();
+                listOfUsersFromFile.Capacity = AmountOfUsersToRead;
+
                 string stringFromFile;
                 string[] dataFromString = new string[5];
                 User newUser;
@@ -25,7 +27,7 @@ namespace WpfApp1.Services.Import
                 {
                     dataFromString = stringFromFile.Split(Semicolon);
 
-                    PersonStruct person = new PersonStruct(dataFromString[1], dataFromString[2], dataFromString[3]);
+                    PersonInfoStruct person = new PersonInfoStruct(dataFromString[1], dataFromString[2], dataFromString[3]);
                     EntranceInfoStruct entranceInfo = new EntranceInfoStruct(dataFromString[0], dataFromString[4], dataFromString[5]);
 
                     newUser = new User(person, entranceInfo);
