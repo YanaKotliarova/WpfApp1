@@ -21,8 +21,8 @@ namespace WpfApp1.Data.Database
         public bool IsDBAvailable { get; set; }
         public bool IsDBEmpty { get; set; }
 
-        public PersonInfoStruct PersonInfo { get; set; }
-        public EntranceInfoStruct EntranceInfo { get; set; }
+        public PersonInfoStruct? PersonInfo { get; set; }
+        public EntranceInfoStruct? EntranceInfo { get; set; }
 
         /// <summary>
         /// A method for asynchronous DB initialization using migration.

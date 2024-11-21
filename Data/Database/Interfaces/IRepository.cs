@@ -7,8 +7,8 @@ namespace WpfApp1.Data.Database.Interfaces
     {
         bool IsDBAvailable { get; set; }
         bool IsDBEmpty { get; set; }
-        PersonInfoStruct PersonInfo { get; set; }
-        EntranceInfoStruct EntranceInfo { get; set; }
+        PersonInfoStruct? PersonInfo { get; set; }
+        EntranceInfoStruct? EntranceInfo { get; set; }
 
         string ReturnConnectionStringValue();
         Task InitializeDBAsync(string connectionString);

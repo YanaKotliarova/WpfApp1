@@ -60,8 +60,6 @@ namespace WpfApp1.ViewModel.ViewModels
                     (_pageIsLoadedCommand = new RelayCommand(obj =>
                     {
                         ExportText = DefaultExportTextBoxMessage;
-                        DisplayProgressBar = !_repository.IsDBAvailable;
-                        IsExportAvailable = _repository.IsDBAvailable;
                     }));
             }
         }
@@ -82,69 +80,71 @@ namespace WpfApp1.ViewModel.ViewModels
                 return _exportIntoFileCommand ??
                     (_exportIntoFileCommand = new RelayCommand(async obj =>
                     {
-                        try
+                        if (_repository.IsDBAvailable)
                         {
-                            if (_fileDialog.SaveFileDialog(out string newFileName))
+                            try
                             {
-                                ExportText = "Экспорт может занять некоторое время, пожалуйста подождите...";
-
-                                DisplayProgressBar = true;
-                                IsExportAvailable = false;
-                                _repository.IsDBAvailable = false;
-
-                                string date = _dataFormatter.FormateDate(DatePicker);
-                                DatePicker = null;
-
-                                string firstName = _dataFormatter.FormateStringData(FirstNameTextBox);
-                                FirstNameTextBox = "";
-
-                                string lastName = _dataFormatter.FormateStringData(LastNameTextBox);
-                                LastNameTextBox = "";
-
-                                string patronymic = _dataFormatter.FormateStringData(PatronymicTextBox);
-                                PatronymicTextBox = "";
-
-                                string city = _dataFormatter.FormateStringData(CityTextBox);
-                                CityTextBox = "";
-
-                                string country = _dataFormatter.FormateStringData(CountryTextBox);
-                                CountryTextBox = "";
-
-                                PersonInfoStruct person = new PersonInfoStruct(firstName, lastName, patronymic);
-                                EntranceInfoStruct entranceInfo = new EntranceInfoStruct(date, city, country);
-
-                                await CreateFileAsync(newFileName);
-                                await Task.Run(async () =>
+                                if (_fileDialog.SaveFileDialog(out string newFileName))
                                 {
-                                    await foreach (List<User> listOfUsers in _repository.GetSelectionFromDBAsync(person, entranceInfo))
+                                    ExportText = "Экспорт может занять некоторое время, пожалуйста подождите...";
+
+                                    DisplayProgressBar = true;
+                                    _repository.IsDBAvailable = false;
+
+                                    string date = _dataFormatter.FormateDate(DatePicker);
+                                    DatePicker = null;
+
+                                    string firstName = _dataFormatter.FormateStringData(FirstNameTextBox);
+                                    FirstNameTextBox = "";
+
+                                    string lastName = _dataFormatter.FormateStringData(LastNameTextBox);
+                                    LastNameTextBox = "";
+
+                                    string patronymic = _dataFormatter.FormateStringData(PatronymicTextBox);
+                                    PatronymicTextBox = "";
+
+                                    string city = _dataFormatter.FormateStringData(CityTextBox);
+                                    CityTextBox = "";
+
+                                    string country = _dataFormatter.FormateStringData(CountryTextBox);
+                                    CountryTextBox = "";
+
+                                    PersonInfoStruct person = new PersonInfoStruct(firstName, lastName, patronymic);
+                                    EntranceInfoStruct entranceInfo = new EntranceInfoStruct(date, city, country);
+
+                                    await CreateFileAsync(newFileName);
+                                    await Task.Run(async () =>
                                     {
-                                        if (listOfUsers.Count > 0) 
-                                            await AddToFileAsync(newFileName, listOfUsers);                                       
+                                        await foreach (List<User> listOfUsers in _repository.GetSelectionFromDBAsync(person, entranceInfo))
+                                        {
+                                            if (listOfUsers.Count > 0)
+                                                await AddToFileAsync(newFileName, listOfUsers);
 
-                                        listOfUsers.Clear();
-                                    }
-                                });
+                                            listOfUsers.Clear();
+                                        }
+                                    });
 
+                                    DisplayProgressBar = false;
+                                    _repository.IsDBAvailable = true;
+
+                                    ExportText = $"Созданную выборку можно увидеть в созданном файле: \"{newFileName}\" " +
+                                    $"либо на вкладке \"Просмотр\"";
+                                }
+                            }
+                            catch (Exception ex)
+                            {
+                                await _metroDialog.ShowMessage(this, "При создании файла произошла ошибка", ex.Message);
                                 DisplayProgressBar = false;
-                                IsExportAvailable = true;
                                 _repository.IsDBAvailable = true;
-
-                                ExportText = $"Созданную выборку можно увидеть в созданном файле: \"{newFileName}\" " +
-                                $"либо на вкладке \"Просмотр\"";
                             }
                         }
-                        catch (Exception ex)
-                        {
-                            await _metroDialog.ShowMessage(this, "При создании файла произошла ошибка", ex.Message);
-                            DisplayProgressBar = false;
-                            IsExportAvailable = true;
-                            _repository.IsDBAvailable = true;
-                        }
+                        else await _metroDialog.ShowMessage(this, "Пожалуйста, подождите!",
+                            "Еще не закончилась предыдущая операция. Повторите попытку позже.");
                     }));
             }
         }
 
-        private bool _displayProgressBar;
+        private bool _displayProgressBar = false;
         /// <summary>
         /// A property associated with an IsVisible property of progress bar.
         /// </summary>
@@ -155,20 +155,6 @@ namespace WpfApp1.ViewModel.ViewModels
             {
                 _displayProgressBar = value;
                 OnPropertyChanged(nameof(DisplayProgressBar));
-            }
-        }
-
-        private bool _isExportAvailable;
-        /// <summary>
-        /// A property associated with an IsEnable property of export button.
-        /// </summary>
-        public bool IsExportAvailable
-        {
-            get { return _isExportAvailable; }
-            set
-            {
-                _isExportAvailable = value;
-                OnPropertyChanged(nameof(IsExportAvailable));
             }
         }
 

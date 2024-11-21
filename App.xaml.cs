@@ -50,14 +50,13 @@ namespace WpfApp1
             services.AddSingleton<EnterConnectionStringPageViewModel>();
 
             services.AddExporterFactory();
-            services.AddScoped<IDataImporter, CsvImporter>();
+            services.AddSingleton<IDataImporter, CsvImporter>();
             services.AddScoped<IRepository<User>, DataBase>();
             services.AddTransient<IDataFormatter, DataFormatter>();
             services.AddTransient<IConnectionStringValidation, ConnectionStringValidation>();
             services.AddTransient<IFileDialog, FileDialog>();
             services.AddTransient<IDialogCoordinator, DialogCoordinator>();
             services.AddTransient<IMetroDialog, MetroDialog>();
-
 
             using (serviceProvider = services.BuildServiceProvider())
             {

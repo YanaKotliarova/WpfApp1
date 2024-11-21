@@ -1,4 +1,4 @@
-﻿<Page x:Class="WpfApp1.View.Pages.Import"
+﻿<Page x:Class="WpfApp1.View.Pages.ImportPage"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -9,10 +9,13 @@
       xmlns:Dialog="clr-namespace:MahApps.Metro.Controls.Dialogs;assembly=MahApps.Metro"
       Dialog:DialogParticipation.Register="{Binding}"
       
-      xmlns:local="clr-namespace:WpfApp1.View.Pages"
+      xmlns:local="clr-namespace:WpfApp1.View.Pages" 
+      xmlns:viewmodel="clr-namespace:WpfApp1.ViewModel.ViewModels" d:DataContext="{d:DesignInstance Type=viewmodel:ImportPageViewModel}"
+      
       mc:Ignorable="d" 
       d:DesignHeight="450" d:DesignWidth="800"
-      Title="Import">
+      Title="Import"
+      Name="PageImport">
 
     <Page.Resources>
         <BooleanToVisibilityConverter x:Key="boolToVisibilityConverter"/>
@@ -42,10 +45,10 @@
         <Button x:Name="buttonChooseFile" Content="Открыть"  
                 Grid.Column="1" Grid.Row="1"
                 Command="{Binding ReadCsvFileAndAddToBDCommand}"
-                IsEnabled="{Binding Path=IsImportAvailable, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"
                 VerticalAlignment="Top" HorizontalAlignment="Left" 
                 MinHeight="25" MinWidth="65"
                 HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
+
 
         <Controls:MetroProgressBar Grid.Row="2" Grid.ColumnSpan="3"
            Height="25" VerticalAlignment="Top"
@@ -53,11 +56,4 @@
            Visibility="{Binding DisplayProgressBar, Converter={StaticResource boolToVisibilityConverter}}" 
            EllipseDiameter="7" EllipseOffset="10"/>
     </Grid>
-
-    <i:Interaction.Triggers>
-        <i:EventTrigger EventName="Loaded">
-            <i:InvokeCommandAction Command="{Binding PageIsLoadedCommand}"/>
-        </i:EventTrigger>
-    </i:Interaction.Triggers>
-
 </Page>

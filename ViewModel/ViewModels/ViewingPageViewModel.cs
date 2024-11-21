@@ -41,7 +41,7 @@ namespace WpfApp1.ViewModel.ViewModels
                         List<User> listForViewing = new List<User>();
                         await Task.Run(async () =>
                         {
-                            await foreach (List<User> listOfUsers in _repository.GetSelectionFromDBAsync(_repository.PersonInfo, _repository.EntranceInfo))
+                            await foreach (List<User> listOfUsers in _repository.GetSelectionFromDBAsync(_repository.PersonInfo!.Value, _repository.EntranceInfo!.Value))
                             {
                                 listForViewing.AddRange(listOfUsers);
                             }

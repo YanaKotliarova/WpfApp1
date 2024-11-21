@@ -58,17 +58,25 @@ namespace WpfApp1.ViewModel.ViewModels
                     (_pageIsLoadedCommand = new RelayCommand(obj =>
                     {
                         IsExportAvailable = !_repository.IsDBEmpty;
+                        if (_repository.PersonInfo != null && _repository.EntranceInfo != null && _repository.IsDBAvailable)
+                            IsViewingAvailable = true;
                     }
                     ));
             }
         }
 
+        private bool _isViewingAvailable = false;
         /// <summary>
         /// A property associated with an IsEnable property of View button.
         /// </summary>
         public bool IsViewingAvailable
         {
-            get { return /*!_users.ReturnListOfUsersForView().IsNullOrEmpty();*/ true; }
+            get { return _isViewingAvailable; }
+            set
+            {
+                _isViewingAvailable = value;
+                OnPropertyChanged(nameof(IsViewingAvailable));
+            }
         }
 
         private bool _isExportAvailable;

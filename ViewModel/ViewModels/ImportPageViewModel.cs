@@ -22,23 +22,6 @@ namespace WpfApp1.ViewModel.ViewModels
             _metroDialog = metroDialog;
         }
 
-        private RelayCommand _pageIsLoadedCommand;
-        /// <summary>
-        /// The command which is called when page is loaded and change text of main text box on export page.
-        /// </summary>
-        public RelayCommand PageIsLoadedCommand
-        {
-            get
-            {
-                return _pageIsLoadedCommand ??
-                    (_pageIsLoadedCommand = new RelayCommand(obj =>
-                    {
-                        DisplayProgressBar = !_repository.IsDBAvailable;
-                        IsImportAvailable = _repository.IsDBAvailable;
-                    }));
-            }
-        }
-
         private string _importTextBoxText = "Выберите, пожалуйста, файл для импорта.";
         /// <summary>
         /// A property associated with the text field used to display information.
@@ -65,45 +48,47 @@ namespace WpfApp1.ViewModel.ViewModels
                 return _readCsvFileAndAddToBDCommand ??
                     (_readCsvFileAndAddToBDCommand = new RelayCommand(async obj =>
                     {
-                        try
+                        if (_repository.IsDBAvailable)
                         {
-                            if (_fileDialog.OpenFileDialog(out string fileName))
+                            try
                             {
-                                IsImportAvailable = false;
-                                DisplayProgressBar = true;
-                                _repository.IsDBAvailable = false;
-
-                                ImportText = "Открытие файла и перенос данных могут занять некоторое время...";
-
-                                await Task.Run(async () =>
+                                if (_fileDialog.OpenFileDialog(out string fileName))
                                 {
-                                    await foreach (List<User> listOfUsers in _importer.ReadFromFileAsync(fileName))
+                                    DisplayProgressBar = true;
+                                    _repository.IsDBAvailable = false;
+
+                                    ImportText = "Открытие файла и перенос данных могут занять некоторое время...";
+
+                                    await Task.Run(async () =>
                                     {
-                                        await _repository.AddToDBAsync(listOfUsers);
-                                        listOfUsers.Clear();
-                                    }
-                                });
+                                        await foreach (List<User> listOfUsers in _importer.ReadFromFileAsync(fileName))
+                                        {
+                                            await _repository.AddToDBAsync(listOfUsers);
+                                            listOfUsers.Clear();
+                                        }
+                                    });
 
+                                    DisplayProgressBar = false;
+                                    _repository.IsDBAvailable = true;
+
+                                    ImportText = "Данные загружены в базу даных и готовы к экспорту.";
+                                }
+                            }
+                            catch (Exception ex)
+                            {
+                                await _metroDialog.ShowMessage(this, "Ошибка", ex.Message);
                                 DisplayProgressBar = false;
-                                IsImportAvailable = true;
                                 _repository.IsDBAvailable = true;
-
-                                ImportText = "Данные загружены в базу даных и готовы к экспорту.";
                             }
                         }
-                        catch (Exception ex)
-                        {
-                            await _metroDialog.ShowMessage(this, "Ошибка", ex.Message);
-                            DisplayProgressBar = false;
-                            IsImportAvailable = true;
-                            _repository.IsDBAvailable = true;
-                        }
+                        else await _metroDialog.ShowMessage(this, "Пожалуйста, подождите!",
+                            "Еще не закончилась предыдущая операция. Повторите попытку позже.");
                     }
                     ));
-        }
+            }
         }
 
-        private bool _displayProgressBar;
+        private bool _displayProgressBar = false;
         /// <summary>
         /// A property associated with an IsVisible property of progress bar.
         /// </summary>
@@ -114,20 +99,6 @@ namespace WpfApp1.ViewModel.ViewModels
             {
                 _displayProgressBar = value;
                 OnPropertyChanged(nameof(DisplayProgressBar));
-            }
-        }
-
-        private bool _isImportAvailable;
-        /// <summary>
-        /// A property associated with an IsEnable property of import button.
-        /// </summary>
-        public bool IsImportAvailable
-        {
-            get { return _isImportAvailable; }
-            set
-            {
-                _isImportAvailable = value;
-                OnPropertyChanged(nameof(IsImportAvailable));
             }
         }
     }

@@ -7,9 +7,9 @@ namespace WpfApp1.View.Pages
     /// <summary>
     /// Interaction logic for Export.xaml
     /// </summary>
-    public partial class Export : Page
+    public partial class ExportPage : Page
     {
-        public Export()
+        public ExportPage()
         {            
             InitializeComponent();
             DataContext = App.serviceProvider.GetService<ExportPageViewModel>();

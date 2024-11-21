@@ -4,9 +4,9 @@ using WpfApp1.ViewModel.ViewModels;
 
 namespace WpfApp1.View.Pages
 {
-    public partial class Import : Page
+    public partial class ImportPage : Page
     {        
-        public Import()
+        public ImportPage()
         {            
             InitializeComponent();
             DataContext = App.serviceProvider.GetService<ImportPageViewModel>();
