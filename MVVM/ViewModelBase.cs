@@ -9,8 +9,7 @@ namespace WpfApp1.MVVM
 
         /// <summary>
         /// A method for taking into account changes 
-        /// in the visual component of the application. 
-        /// It is mainly used for text fields.
+        /// in the visual component of the application.
         /// </summary>
         /// <param name="propertyName"> Имя компонента. </param>
         public void OnPropertyChanged([CallerMemberName] string propertyName = "")

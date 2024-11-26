@@ -1,4 +1,6 @@
 ﻿using MahApps.Metro.Controls.Dialogs;
+using System.Windows;
+using System.Windows.Controls;
 using WpfApp1.View.UI.Interfaces;
 
 namespace WpfApp1.View.UI
@@ -17,9 +19,19 @@ namespace WpfApp1.View.UI
         /// <param name="header"> Header of dialog. </param>
         /// <param name="message"> Message of dialog. </param>
         /// <returns></returns>
-        public async Task ShowMessage(Object viewModel, string header, string message)
+        public async Task ShowMessage(object viewModel, string header, string message)
         {
             await _dialogCoordinator.ShowMessageAsync(viewModel, header, message);
+        }
+
+        public object ReturnViewModel()
+        {
+            var window = Application.Current.Windows.OfType<Window>().SingleOrDefault(w => w.IsActive);
+            Frame frame = window.FindName("MainFrame") as Frame;
+            Page page = frame.Content as Page;
+            object viewModel = page.DataContext;
+
+            return viewModel;
         }
     }
 }

@@ -6,7 +6,7 @@ namespace WpfApp1.Services.Import
     internal class CsvImporter : IDataImporter
     {
         private const string Semicolon = ";";
-        private const int AmountOfUsersToRead = 1000;
+        private const int AmountOfUsersToRead = 10000;
 
         /// <summary>
         /// Asynchronous method of reading data from a CSV file.

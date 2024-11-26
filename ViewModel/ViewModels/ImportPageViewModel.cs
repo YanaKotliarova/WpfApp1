@@ -22,20 +22,6 @@ namespace WpfApp1.ViewModel.ViewModels
             _metroDialog = metroDialog;
         }
 
-        private string _importTextBoxText = "Выберите, пожалуйста, файл для импорта.";
-        /// <summary>
-        /// A property associated with the text field used to display information.
-        /// </summary>
-        public string ImportText
-        {
-            get { return _importTextBoxText; }
-            set
-            {
-                _importTextBoxText = value;
-                OnPropertyChanged(nameof(ImportText));
-            }
-        }
-
         private RelayCommand _readCsvFileAndAddToBDCommand;
         /// <summary>
         ///The command associated with the button to open the csv file. 
@@ -57,34 +43,70 @@ namespace WpfApp1.ViewModel.ViewModels
                                     DisplayProgressBar = true;
                                     _repository.IsDBAvailable = false;
 
+                                    IsButtonEnable = false;
+
                                     ImportText = "Открытие файла и перенос данных могут занять некоторое время...";
 
-                                    await Task.Run(async () =>
+                                    await foreach (List<User> listOfUsers in _importer.ReadFromFileAsync(fileName))
                                     {
-                                        await foreach (List<User> listOfUsers in _importer.ReadFromFileAsync(fileName))
-                                        {
-                                            await _repository.AddToDBAsync(listOfUsers);
-                                            listOfUsers.Clear();
-                                        }
-                                    });
+                                        await _repository.AddToDBAsync(listOfUsers);
+                                        listOfUsers.Clear();
+                                    }
 
                                     DisplayProgressBar = false;
                                     _repository.IsDBAvailable = true;
+
+                                    IsButtonEnable = true;
+
+                                    var viewModel = _metroDialog.ReturnViewModel();
+                                    await _metroDialog.ShowMessage(viewModel, "Импорт завершен!",
+                                        "Данные загружены в базу даных и готовы к экспорту.");
 
                                     ImportText = "Данные загружены в базу даных и готовы к экспорту.";
                                 }
                             }
                             catch (Exception ex)
                             {
-                                await _metroDialog.ShowMessage(this, "Ошибка", ex.Message);
+                                var viewModel = _metroDialog.ReturnViewModel();
+                                await _metroDialog.ShowMessage(viewModel, "Ошибка", ex.Message);
                                 DisplayProgressBar = false;
                                 _repository.IsDBAvailable = true;
+
+                                IsButtonEnable = true;
                             }
                         }
-                        else await _metroDialog.ShowMessage(this, "Пожалуйста, подождите!",
+                        else
+                        {
+                            await _metroDialog.ShowMessage(this, "Пожалуйста, подождите!",
                             "Еще не закончилась предыдущая операция. Повторите попытку позже.");
+                        }
                     }
                     ));
+            }
+        }
+
+        private string _importTextBoxText = "Выберите, пожалуйста, файл для импорта.";
+        /// <summary>
+        /// A property associated with the text field used to display information.
+        /// </summary>
+        public string ImportText
+        {
+            get { return _importTextBoxText; }
+            set
+            {
+                _importTextBoxText = value;
+                OnPropertyChanged(nameof(ImportText));
+            }
+        }
+
+        private bool _isButtonEnable = true;
+        public bool IsButtonEnable
+        {
+            get { return _isButtonEnable; }
+            set
+            {
+                _isButtonEnable = value;
+                OnPropertyChanged(nameof(IsButtonEnable));
             }
         }
 

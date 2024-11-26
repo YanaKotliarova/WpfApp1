@@ -45,6 +45,7 @@
         <Button x:Name="buttonChooseFile" Content="Открыть"  
                 Grid.Column="1" Grid.Row="1"
                 Command="{Binding ReadCsvFileAndAddToBDCommand}"
+                IsEnabled="{Binding IsButtonEnable}"
                 VerticalAlignment="Top" HorizontalAlignment="Left" 
                 MinHeight="25" MinWidth="65"
                 HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>

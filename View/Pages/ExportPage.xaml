@@ -48,6 +48,7 @@
                 Grid.Column="3" Grid.Row="2" 
                 MinWidth="65" MinHeight="25"
                 Command="{Binding ExportIntoFileCommand}"
+                IsEnabled="{Binding IsButtonEnable}"
                 HorizontalAlignment="Center" VerticalAlignment="Top" 
                 ScrollViewer.VerticalScrollBarVisibility="Disabled" VerticalContentAlignment="Center" Margin="0,55,0,0"/>
 

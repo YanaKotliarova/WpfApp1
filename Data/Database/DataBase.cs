@@ -7,7 +7,7 @@ namespace WpfApp1.Data.Database
 {
     internal class DataBase : IRepository<User>
     {
-        private const int AmountOfUsersForSelection = 1000;
+        private const int AmountOfUsersForSelection = 10000;
 
         private readonly ApplicationContext db;
         private readonly IConnectionStringValidation _connectionStringValidation;

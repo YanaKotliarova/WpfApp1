@@ -33,21 +33,6 @@ namespace WpfApp1.ViewModel.ViewModels
             _metroDialog = metroDialog;
         }
 
-        private string _exportTextBoxText;
-        /// <summary>
-        /// A property associated with the text field used to display information.
-        /// </summary>
-        public string ExportText
-        {
-            get { return _exportTextBoxText; }
-            set
-            {
-                _exportTextBoxText = value;
-                OnPropertyChanged(nameof(ExportText));
-            }
-        }
-
-
         private RelayCommand _pageIsLoadedCommand;
         /// <summary>
         /// The command which is called when page is loaded and change text of main text box on export page.
@@ -91,6 +76,8 @@ namespace WpfApp1.ViewModel.ViewModels
                                     DisplayProgressBar = true;
                                     _repository.IsDBAvailable = false;
 
+                                    IsButtonEnable = false;
+
                                     string date = _dataFormatter.FormateDate(DatePicker);
                                     DatePicker = null;
 
@@ -126,6 +113,11 @@ namespace WpfApp1.ViewModel.ViewModels
 
                                     DisplayProgressBar = false;
                                     _repository.IsDBAvailable = true;
+                                    IsButtonEnable = true;
+
+                                    var viewModel = _metroDialog.ReturnViewModel();
+                                    await _metroDialog.ShowMessage(viewModel, "Экспорт завершён!", 
+                                        "Файл " + newFileName + " был успешно создан.");
 
                                     ExportText = $"Созданную выборку можно увидеть в созданном файле: \"{newFileName}\" " +
                                     $"либо на вкладке \"Просмотр\"";
@@ -133,14 +125,42 @@ namespace WpfApp1.ViewModel.ViewModels
                             }
                             catch (Exception ex)
                             {
-                                await _metroDialog.ShowMessage(this, "При создании файла произошла ошибка", ex.Message);
+                                var viewModel = _metroDialog.ReturnViewModel();
+                                await _metroDialog.ShowMessage(viewModel, "При создании файла произошла ошибка", ex.Message);
                                 DisplayProgressBar = false;
                                 _repository.IsDBAvailable = true;
+
+                                IsButtonEnable = true;
                             }
                         }
                         else await _metroDialog.ShowMessage(this, "Пожалуйста, подождите!",
                             "Еще не закончилась предыдущая операция. Повторите попытку позже.");
                     }));
+            }
+        }
+
+        private string _exportTextBoxText;
+        /// <summary>
+        /// A property associated with the text field used to display information.
+        /// </summary>
+        public string ExportText
+        {
+            get { return _exportTextBoxText; }
+            set
+            {
+                _exportTextBoxText = value;
+                OnPropertyChanged(nameof(ExportText));
+            }
+        }
+
+        private bool _isButtonEnable = true;
+        public bool IsButtonEnable
+        {
+            get { return _isButtonEnable; }
+            set
+            {
+                _isButtonEnable = value;
+                OnPropertyChanged(nameof(IsButtonEnable));
             }
         }
 

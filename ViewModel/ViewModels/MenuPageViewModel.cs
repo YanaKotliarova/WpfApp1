@@ -39,7 +39,8 @@ namespace WpfApp1.ViewModel.ViewModels
                         }
                         catch (Exception ex)
                         {
-                            await _metroDialog.ShowMessage(this, "Ошибка при переходе на страницу", ex.Message);
+                            var viewModel = _metroDialog.ReturnViewModel();
+                            await _metroDialog.ShowMessage(viewModel, "Ошибка при переходе на страницу", ex.Message);
                         }
                     }
                     ));
@@ -55,11 +56,19 @@ namespace WpfApp1.ViewModel.ViewModels
             get
             {
                 return _pageIsLoadedCommand ??
-                    (_pageIsLoadedCommand = new RelayCommand(obj =>
+                    (_pageIsLoadedCommand = new RelayCommand(async obj =>
                     {
-                        IsExportAvailable = !_repository.IsDBEmpty;
-                        if (_repository.PersonInfo != null && _repository.EntranceInfo != null && _repository.IsDBAvailable)
-                            IsViewingAvailable = true;
+                        try
+                        {
+                            IsExportAvailable = !_repository.IsDBEmpty;
+                            if (_repository.PersonInfo != null && _repository.EntranceInfo != null && _repository.IsDBAvailable)
+                                IsViewingAvailable = true;
+                        }
+                        catch (Exception ex) 
+                        {
+                            var viewModel = _metroDialog.ReturnViewModel();
+                            await _metroDialog.ShowMessage(viewModel, "Возникла непредвиденная ошибка", ex.Message);
+                        }
                     }
                     ));
             }
