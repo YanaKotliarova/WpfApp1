@@ -87,6 +87,10 @@ namespace WpfApp1.ViewModel.ViewModels
             }
         }
 
+        /// <summary>
+        /// The method for updating collection of users for viewing on page.
+        /// </summary>
+        /// <param name="enumerable"></param>
         private void UpdateCollection(IEnumerable<User> enumerable)
         {
             ListOfUsers.Clear();
@@ -99,7 +103,7 @@ namespace WpfApp1.ViewModel.ViewModels
 
         private RelayCommand _firstCommand;
         /// <summary>
-        /// 
+        /// The command associated with the button to open first page of showing selection.
         /// </summary>
         public RelayCommand FirstCommand
         {
@@ -118,7 +122,7 @@ namespace WpfApp1.ViewModel.ViewModels
 
         private RelayCommand _previousCommand;
         /// <summary>
-        /// 
+        /// The command associated with the button to open previous page of showing selection.
         /// </summary>
         public RelayCommand PreviousCommand
         {
@@ -139,7 +143,7 @@ namespace WpfApp1.ViewModel.ViewModels
 
         private RelayCommand _nextCommand;
         /// <summary>
-        /// 
+        /// The command associated with the button to open next page of showing selection.
         /// </summary>
         public RelayCommand NextCommand
         {
@@ -160,7 +164,7 @@ namespace WpfApp1.ViewModel.ViewModels
 
         private RelayCommand _lastCommand;
         /// <summary>
-        /// 
+        /// The command associated with the button to open last page of showing selection.
         /// </summary>
         public RelayCommand LastCommand
         {
@@ -180,7 +184,7 @@ namespace WpfApp1.ViewModel.ViewModels
 
         private int _currentPage;
         /// <summary>
-        /// 
+        /// A property for storing and update current page number.
         /// </summary>
         public int CurrentPage
         {
@@ -195,7 +199,7 @@ namespace WpfApp1.ViewModel.ViewModels
 
         private int _usersPerPage;
         /// <summary>
-        /// 
+        /// A property for storing amount of users which should be shown on one page.
         /// </summary>
         public int UsersPerPage
         {
@@ -208,6 +212,9 @@ namespace WpfApp1.ViewModel.ViewModels
             }
         }
 
+        /// <summary>
+        /// The method for updating total number of pages.
+        /// </summary>
         private void UpdateUsersCount()
         {
             NumberOfPages = (int)Math.Ceiling((double)ListOfUsersForViewing.Count / UsersPerPage);
@@ -218,7 +225,7 @@ namespace WpfApp1.ViewModel.ViewModels
 
         private int _numberOfPages;
         /// <summary>
-        /// 
+        /// A property for storing and update total number of pages of selection.
         /// </summary>
         public int NumberOfPages
         {
@@ -231,6 +238,9 @@ namespace WpfApp1.ViewModel.ViewModels
             }
         }
 
+        /// <summary>
+        /// The method to update IsEnable state of selection page navigation buttons.
+        /// </summary>
         private void UpdateEnableState()
         {
             IsFirstEnable = CurrentPage > 1;
@@ -241,7 +251,7 @@ namespace WpfApp1.ViewModel.ViewModels
 
         private bool _isFirstEnable;
         /// <summary>
-        /// 
+        /// A property associated with an IsEnable property of to go to the first page button.
         /// </summary>
         public bool IsFirstEnable
         {
@@ -255,7 +265,7 @@ namespace WpfApp1.ViewModel.ViewModels
 
         private bool _isPreviousEnable;
         /// <summary>
-        /// 
+        /// A property associated with an IsEnable property of to go to the previous page button.
         /// </summary>
         public bool IsPreviousEnable
         {
@@ -269,7 +279,7 @@ namespace WpfApp1.ViewModel.ViewModels
 
         private bool _isNextEnable;
         /// <summary>
-        /// 
+        /// A property associated with an IsEnable property of to go to the next page button.
         /// </summary>
         public bool IsNextEnable
         {
@@ -283,7 +293,7 @@ namespace WpfApp1.ViewModel.ViewModels
 
         private bool _isLastEnable;
         /// <summary>
-        /// 
+        /// A property associated with an IsEnable property of to go to the last page button.
         /// </summary>
         public bool IsLastEnable
         {

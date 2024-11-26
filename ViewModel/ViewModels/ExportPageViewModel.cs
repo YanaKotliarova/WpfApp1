@@ -154,6 +154,9 @@ namespace WpfApp1.ViewModel.ViewModels
         }
 
         private bool _isButtonEnable = true;
+        /// <summary>
+        /// A property associated with an IsEnable property of export button.
+        /// </summary>
         public bool IsButtonEnable
         {
             get { return _isButtonEnable; }

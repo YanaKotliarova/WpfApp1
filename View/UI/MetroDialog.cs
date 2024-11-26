@@ -24,6 +24,10 @@ namespace WpfApp1.View.UI
             await _dialogCoordinator.ShowMessageAsync(viewModel, header, message);
         }
 
+        /// <summary>
+        /// The method for returning viewmodel of the current open page.
+        /// </summary>
+        /// <returns></returns>
         public object ReturnViewModel()
         {
             var window = Application.Current.Windows.OfType<Window>().SingleOrDefault(w => w.IsActive);
