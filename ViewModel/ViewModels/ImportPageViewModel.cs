@@ -85,9 +85,9 @@ namespace WpfApp1.ViewModel.ViewModels
 
                                     _repository.IsDBAvailable = true;
 
-                                    //var viewModel = _metroDialog.ReturnViewModel();
-                                    //await _metroDialog.ShowMessage(viewModel, "Импорт завершен!",
-                                    //    "Данные загружены в базу даных и готовы к экспорту.");
+                                    var viewModel = _metroDialog.ReturnViewModel();
+                                    await _metroDialog.ShowMessage(viewModel, "Импорт завершен!",
+                                        "Данные загружены в базу даных и готовы к экспорту.");
 
                                     ImportText = "Данные загружены в базу даных и готовы к экспорту.";
                                 }

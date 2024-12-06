@@ -1,7 +1,5 @@
-﻿using System.Xml;
-using System;
+﻿using System.Xml.Linq;
 using WpfApp1.Model;
-using System.Xml.Linq;
 
 namespace WpfApp1.Services.Import
 {
@@ -19,6 +17,12 @@ namespace WpfApp1.Services.Import
         private const int AmountOfUsersToRead = 10000;
 
         public string ImporterName { get; set; } = "XmlImporter";
+
+        /// <summary>
+        /// The method for readind created xml file.
+        /// </summary>
+        /// <param name="fileName"> Name of file for reading. </param>
+        /// <returns></returns>
         public async IAsyncEnumerable<List<User>> ReadFromFileAsync(string fileName)
         {
             List<User> users = new List<User>();

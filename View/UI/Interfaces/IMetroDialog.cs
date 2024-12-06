@@ -7,6 +7,6 @@ namespace WpfApp1.View.UI.Interfaces
         object ReturnViewModel();
         Task ShowMessage(object viewModel, string header, string message);
         Task<ProgressDialogController> ShowMessageWithProgressBar(object viewModel, string header, string message);
-        Task CloseShowMessageWithProgressBar(ProgressDialogController controller);
+        Task CloseMessageWithProgressBar(ProgressDialogController controller);
     }
 }

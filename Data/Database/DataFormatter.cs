@@ -21,6 +21,11 @@ namespace WpfApp1.Data.Database
             return date;
         }
 
+        /// <summary>
+        /// The method of converting the date from DateTime to DateOnly format.
+        /// </summary>
+        /// <param name="dateTime"></param>
+        /// <returns></returns>
         public DateOnly? FormateDateTime(DateTime? dateTime)
         {
             if (dateTime == null) return null;

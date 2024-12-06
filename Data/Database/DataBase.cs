@@ -25,6 +25,9 @@ namespace WpfApp1.Data.Database
         }
 
         private bool _isDBAvailable = true;
+        /// <summary>
+        /// A property for tracking availability of DB.
+        /// </summary>
         public bool IsDBAvailable
         {
             get { return _isDBAvailable; }
@@ -35,6 +38,9 @@ namespace WpfApp1.Data.Database
             }
         }
         private bool _isDBEmpty = true;
+        /// <summary>
+        /// A property for tracking emptiness of DB.
+        /// </summary>
         public bool IsDBEmpty 
         { 
             get { return _isDBEmpty; } 
@@ -46,6 +52,9 @@ namespace WpfApp1.Data.Database
         }
 
         private bool _wasExport = false;
+        /// <summary>
+        /// A property for tracking if export was and ended.
+        /// </summary>
         public bool WasExport
         {
             get { return _wasExport; }
@@ -76,7 +85,7 @@ namespace WpfApp1.Data.Database
         }
 
         /// <summary>
-        /// Return value of connection string.
+        /// The method for returning value of connection string.
         /// </summary>
         /// <returns></returns>
         public string ReturnConnectionStringValue()

@@ -27,6 +27,10 @@ namespace WpfApp1.ViewModel.ViewModels
             _fileDialog = fileDialog;
         }
 
+        /// <summary>
+        /// The method for getting data from created excel or xml file for viewing.
+        /// </summary>
+        /// <returns></returns>
         public async override Task GetData()
         {
             try
@@ -41,7 +45,7 @@ namespace WpfApp1.ViewModel.ViewModels
                         ListOfUsersForViewing.AddRange(listOfUsers);
                     }
                 });
-                await _metroDialog.CloseShowMessageWithProgressBar(metroDialogController);
+                await _metroDialog.CloseMessageWithProgressBar(metroDialogController);
             }
             catch (Exception)
             {
@@ -53,6 +57,11 @@ namespace WpfApp1.ViewModel.ViewModels
             }
         }
 
+        /// <summary>
+        /// The method for getting needed type of file importer.
+        /// </summary>
+        /// <returns></returns>
+        /// <exception cref="Throw an exeption 'Неверный формат файла' when choodes file is in the wrong format.">  </exception>
         public IDataImporter GetDataImporter()
         {
             if (Path.GetExtension(FileName).Equals(ExcelExtension))
@@ -99,7 +108,7 @@ namespace WpfApp1.ViewModel.ViewModels
 
         private RelayCommand _pageIsLoadedCommand;
         /// <summary>
-        /// The command which is called when page is loaded and change text of main text box on export page.
+        /// The command which is called when page is loaded and made file name text box empty.
         /// </summary>
         public RelayCommand PageIsLoadedCommand
         {

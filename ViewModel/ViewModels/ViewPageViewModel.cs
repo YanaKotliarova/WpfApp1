@@ -54,7 +54,8 @@ namespace WpfApp1.ViewModel.ViewModels
 
         private RelayCommand _showSelectionCommand;
         /// <summary>
-        /// The command associated with the button to show a selection from DB.
+        /// The command associated with the button to show a selection from DB or file
+        /// which is got from GetData method.
         /// </summary>
         public RelayCommand ShowSelectionCommand
         {
@@ -75,6 +76,11 @@ namespace WpfApp1.ViewModel.ViewModels
             }
         }
 
+        /// <summary>
+        /// The method for getting list of users from DB or created file.
+        /// Overrides in derived classes.
+        /// </summary>
+        /// <returns></returns>
         public abstract Task GetData();
 
         /// <summary>

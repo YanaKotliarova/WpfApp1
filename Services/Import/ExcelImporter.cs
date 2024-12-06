@@ -7,7 +7,15 @@ namespace WpfApp1.Services.Import
     class ExcelImporter : IDataImporter
     {
         private const int AmountOfUsersToRead = 10000;
+
         public string ImporterName { get; set; } = "ExcelImporter";
+
+        /// <summary>
+        /// The method for readind created excel file.
+        /// </summary>
+        /// <param name="fileName"> Name of file for reading. </param>
+        /// <returns></returns>
+        /// <exception cref="Exception"></exception>
         public async IAsyncEnumerable<List<User>> ReadFromFileAsync(string fileName)
         {
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;

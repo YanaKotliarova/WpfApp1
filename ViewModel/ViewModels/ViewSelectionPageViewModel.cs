@@ -14,6 +14,10 @@ namespace WpfApp1.ViewModel.ViewModels
             _metroDialog = metroDialog;
         }
 
+        /// <summary>
+        /// The method for getting selection from DB for viewing.
+        /// </summary>
+        /// <returns></returns>
         public async override Task GetData()
         {
             try
@@ -28,7 +32,7 @@ namespace WpfApp1.ViewModel.ViewModels
                         ListOfUsersForViewing.AddRange(listOfUsers);
                     }
                 });
-                await _metroDialog.CloseShowMessageWithProgressBar(metroDialogController);
+                await _metroDialog.CloseMessageWithProgressBar(metroDialogController);
             }
             catch (Exception ex)
             {
