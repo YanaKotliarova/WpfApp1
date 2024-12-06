@@ -3,6 +3,7 @@ using WpfApp1.Data.Database.Interfaces;
 using WpfApp1.Model;
 using WpfApp1.MVVM;
 using WpfApp1.View.UI.Interfaces;
+using WpfApp1.ViewModel.Events;
 
 namespace WpfApp1.ViewModel.ViewModels
 {
@@ -10,11 +11,17 @@ namespace WpfApp1.ViewModel.ViewModels
     {      
         private readonly IRepository<User> _repository;
         private readonly IMetroDialog _metroDialog;
+        private readonly IEventAggregator _eventAggregator;
 
-        public MenuPageViewModel(IRepository<User> repository, IMetroDialog metroDialog)
+        public MenuPageViewModel(IRepository<User> repository, IMetroDialog metroDialog, IEventAggregator eventAggregator)
         {
             _repository = repository;
             _metroDialog = metroDialog;
+            _eventAggregator = eventAggregator;
+
+            _eventAggregator.GetEvent<ExportingAvailability>().Subscribe(state => { IsExportAvailable = !state; });
+
+            _eventAggregator.GetEvent<ViewingAvailability>().Subscribe(state => { IsViewingAvailable = state; });
         }
 
         private RelayCommand _openPageCommand;
@@ -42,8 +49,7 @@ namespace WpfApp1.ViewModel.ViewModels
                             var viewModel = _metroDialog.ReturnViewModel();
                             await _metroDialog.ShowMessage(viewModel, "Ошибка при переходе на страницу", ex.Message);
                         }
-                    }
-                    ));
+                    }));
             }
         }
 
@@ -61,8 +67,6 @@ namespace WpfApp1.ViewModel.ViewModels
                         try
                         {
                             IsExportAvailable = !_repository.IsDBEmpty;
-                            if (_repository.PersonInfo != null && _repository.EntranceInfo != null && _repository.IsDBAvailable)
-                                IsViewingAvailable = true;
                         }
                         catch (Exception ex) 
                         {
@@ -74,7 +78,7 @@ namespace WpfApp1.ViewModel.ViewModels
             }
         }
 
-        private bool _isViewingAvailable = false;
+        private bool _isViewingAvailable;
         /// <summary>
         /// A property associated with an IsEnable property of View button.
         /// </summary>

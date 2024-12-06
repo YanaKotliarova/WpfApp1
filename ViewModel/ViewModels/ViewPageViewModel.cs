@@ -1,21 +1,14 @@
 ﻿using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Windows.Data;
-using WpfApp1.Data.Database.Interfaces;
 using WpfApp1.Model;
 using WpfApp1.MVVM;
 
 namespace WpfApp1.ViewModel.ViewModels
 {
-    class ViewingPageViewModel : ViewModelBase
+    abstract class ViewPageViewModel : ViewModelBase
     {
         private const int AmoutOfUsersPerPage = 10;
-
-        private readonly IRepository<User> _repository;
-        public ViewingPageViewModel(IRepository<User> repository)
-        {
-            _repository = repository;
-        }
         public List<User> ListOfUsersForViewing { get; private set; } = new List<User>();
 
         private ICollectionView _usersCollection;
@@ -53,6 +46,7 @@ namespace WpfApp1.ViewModel.ViewModels
                     {
                         ListOfUsersForViewing.Clear();
                         ListOfUsers.Clear();
+                        NumberOfPages = 1;
                     }
                     ));
             }
@@ -72,13 +66,7 @@ namespace WpfApp1.ViewModel.ViewModels
                         UsersPerPage = AmoutOfUsersPerPage;
                         UsersCollection = CollectionViewSource.GetDefaultView(ListOfUsers);
 
-                        await Task.Run(async () =>
-                        {
-                            await foreach (List<User> listOfUsers in _repository.GetSelectionFromDBAsync(_repository.PersonInfo!.Value, _repository.EntranceInfo!.Value))
-                            {
-                                ListOfUsersForViewing.AddRange(listOfUsers);
-                            }
-                        });
+                        await GetData();
 
                         UpdateCollection(ListOfUsersForViewing.Take(UsersPerPage));
                         UpdateUsersCount();
@@ -86,6 +74,8 @@ namespace WpfApp1.ViewModel.ViewModels
                     ));
             }
         }
+
+        public abstract Task GetData();
 
         /// <summary>
         /// The method for updating collection of users for viewing on page.
@@ -302,20 +292,6 @@ namespace WpfApp1.ViewModel.ViewModels
             {
                 _isLastEnable = value;
                 OnPropertyChanged(nameof(IsLastEnable));
-            }
-        }
-
-        private string _viewTextBoxText;
-        /// <summary>
-        /// A property associated with the text field used to display information.
-        /// </summary>
-        public string ViewText
-        {
-            get { return _viewTextBoxText; }
-            set
-            {
-                _viewTextBoxText = value;
-                OnPropertyChanged(nameof(ViewText));
             }
         }
     }

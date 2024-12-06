@@ -2,6 +2,7 @@
 using Microsoft.IdentityModel.Tokens;
 using WpfApp1.Data.Database.Interfaces;
 using WpfApp1.Model;
+using WpfApp1.ViewModel.Events;
 
 namespace WpfApp1.Data.Database
 {
@@ -11,15 +12,49 @@ namespace WpfApp1.Data.Database
 
         private readonly ApplicationContext db;
         private readonly IConnectionStringValidation _connectionStringValidation;
+        private readonly IEventAggregator _eventAggregator;
+        private readonly IDataFormatter _dataFormatter;
 
-        public DataBase(IConnectionStringValidation connectionStringValidation)
+        public DataBase(IConnectionStringValidation connectionStringValidation, IEventAggregator eventAggregator, 
+            IDataFormatter dataFormatter)
         {
             db = new ApplicationContext();
             _connectionStringValidation = connectionStringValidation;
+            _eventAggregator = eventAggregator;
+            _dataFormatter = dataFormatter;
         }
 
-        public bool IsDBAvailable { get; set; }
-        public bool IsDBEmpty { get; set; }
+        private bool _isDBAvailable = true;
+        public bool IsDBAvailable
+        {
+            get { return _isDBAvailable; }
+            set
+            {
+                _isDBAvailable = value;
+                _eventAggregator.GetEvent<ImportExportAvailability>().Publish(_isDBAvailable);
+            }
+        }
+        private bool _isDBEmpty = true;
+        public bool IsDBEmpty 
+        { 
+            get { return _isDBEmpty; } 
+            set
+            {
+                _isDBEmpty = value;
+                _eventAggregator.GetEvent<ExportingAvailability>().Publish(_isDBEmpty);
+            }
+        }
+
+        private bool _wasExport = false;
+        public bool WasExport
+        {
+            get { return _wasExport; }
+            set
+            {
+                _wasExport = value;
+                _eventAggregator.GetEvent<ViewingAvailability>().Publish(_wasExport);
+            }
+        }
 
         public PersonInfoStruct? PersonInfo { get; set; }
         public EntranceInfoStruct? EntranceInfo { get; set; }
@@ -58,8 +93,6 @@ namespace WpfApp1.Data.Database
             await db.Users.AddRangeAsync(listOfUsersFromFile);
             await db.SaveChangesAsync();
 
-            listOfUsersFromFile.Clear();
-
             if (IsDBEmpty) IsDBEmpty = CheckAreThereUsersInDB();
         }
 
@@ -88,12 +121,14 @@ namespace WpfApp1.Data.Database
             PersonInfo = person;
             EntranceInfo = entranceInfo;
 
+            string dateForComparison = _dataFormatter.FormateDateOnly(entranceInfo.DateOfEntrance);
+
             while (amountOfViewUsers < amountOfUsersInDB)
             {
                 listOfUsersFromDB.AddRange(await
                 (from user in db.Users.Skip(amountOfViewUsers).Take(AmountOfUsersForSelection)
                  where
-                 EF.Functions.Like(user.Date.ToString(), entranceInfo.DateOfEntrance) &&
+                 EF.Functions.Like(user.Date.ToString(), dateForComparison) &&
                  EF.Functions.Like(user.FirstName, person.FirstName) &&
                  EF.Functions.Like(user.LastName, person.LastName) &&
                  EF.Functions.Like(user.Patronymic, person.Patronymic) &&

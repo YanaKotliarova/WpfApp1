@@ -8,6 +8,8 @@ namespace WpfApp1.Services.Import
         private const string Semicolon = ";";
         private const int AmountOfUsersToRead = 10000;
 
+        public string ImporterName { get; set; } = "CsvImporter";
+
         /// <summary>
         /// Asynchronous method of reading data from a CSV file.
         /// </summary>
@@ -18,17 +20,18 @@ namespace WpfApp1.Services.Import
             using (StreamReader streamReader = new StreamReader(fileName))
             {
                 List<User> listOfUsersFromFile = new List<User>();
-                listOfUsersFromFile.Capacity = AmountOfUsersToRead;
-
                 string stringFromFile;
                 string[] dataFromString = new string[5];
+                DateOnly date;
                 User newUser;
                 while ((stringFromFile = await streamReader.ReadLineAsync()) != null)
                 {
                     dataFromString = stringFromFile.Split(Semicolon);
 
+                    date = DateOnly.Parse(dataFromString[0]);
+
                     PersonInfoStruct person = new PersonInfoStruct(dataFromString[1], dataFromString[2], dataFromString[3]);
-                    EntranceInfoStruct entranceInfo = new EntranceInfoStruct(dataFromString[0], dataFromString[4], dataFromString[5]);
+                    EntranceInfoStruct entranceInfo = new EntranceInfoStruct(date, dataFromString[4], dataFromString[5]);
 
                     newUser = new User(person, entranceInfo);
 
@@ -43,5 +46,4 @@ namespace WpfApp1.Services.Import
             }
         }
     }
-
 }

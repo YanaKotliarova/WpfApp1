@@ -13,12 +13,18 @@ namespace WpfApp1.Data.Database
         /// </summary>
         /// <param name="date"> Date to be converted. </param>
         /// <returns></returns>
-        public string FormateDate(DateTime? dateTime)
+        public string FormateDateOnly(DateOnly? dateOnly)
         {
             string date;
-            if (dateTime.HasValue) date = dateTime.Value.ToString(DateFormat);
+            if (dateOnly.HasValue) date = dateOnly.Value.ToString(DateFormat);
             else date = Percent;
             return date;
+        }
+
+        public DateOnly? FormateDateTime(DateTime? dateTime)
+        {
+            if (dateTime == null) return null;
+            return DateOnly.FromDateTime(dateTime.Value);
         }
 
         /// <summary>

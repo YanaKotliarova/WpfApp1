@@ -48,14 +48,13 @@
                 Grid.Column="3" Grid.Row="2" 
                 MinWidth="65" MinHeight="25"
                 Command="{Binding ExportIntoFileCommand}"
-                IsEnabled="{Binding IsButtonEnable}"
                 HorizontalAlignment="Center" VerticalAlignment="Top" 
                 ScrollViewer.VerticalScrollBarVisibility="Disabled" VerticalContentAlignment="Center" Margin="0,55,0,0"/>
 
         <Controls:MetroProgressBar Grid.Row="3" Grid.ColumnSpan="3"
                                    Height="25" VerticalAlignment="Top"
-                                   Foreground="#FF8277CB" IsIndeterminate="True" 
-                                   Visibility="{Binding DisplayProgressBar, Converter={StaticResource boolToVisibilityConverter}}" 
+                                   Foreground="#FF8277CB" IsIndeterminate="True"
+                                   Visibility="{Binding IsProgressBarVisible, Converter={StaticResource boolToVisibilityConverter}}" 
                                    EllipseDiameter="7" EllipseOffset="10"/>
 
         <DatePicker x:Name="datePicker" Grid.Column="1" Grid.Row="2"

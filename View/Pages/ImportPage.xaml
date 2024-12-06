@@ -45,7 +45,6 @@
         <Button x:Name="buttonChooseFile" Content="Открыть"  
                 Grid.Column="1" Grid.Row="1"
                 Command="{Binding ReadCsvFileAndAddToBDCommand}"
-                IsEnabled="{Binding IsButtonEnable}"
                 VerticalAlignment="Top" HorizontalAlignment="Left" 
                 MinHeight="25" MinWidth="65"
                 HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
@@ -54,7 +53,14 @@
         <Controls:MetroProgressBar Grid.Row="2" Grid.ColumnSpan="3"
            Height="25" VerticalAlignment="Top"
            Foreground="#FF8277CB" IsIndeterminate="True" 
-           Visibility="{Binding DisplayProgressBar, Converter={StaticResource boolToVisibilityConverter}}" 
+           Visibility="{Binding IsProgressBarVisible, Converter={StaticResource boolToVisibilityConverter}}" 
            EllipseDiameter="7" EllipseOffset="10"/>
     </Grid>
+
+    <i:Interaction.Triggers>
+        <i:EventTrigger EventName="Loaded">
+            <i:InvokeCommandAction Command="{Binding PageIsLoadedCommand}"/>
+        </i:EventTrigger>
+    </i:Interaction.Triggers>
+    
 </Page>

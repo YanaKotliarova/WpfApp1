@@ -5,7 +5,6 @@ namespace WpfApp1.View.UI
 {
     internal class FileDialog: IFileDialog
     {
-        private const string OpenFileExtensionFilter = "Special text files (*.csv) | *.csv";
         private const string SaveFileExtensionFilter = "Excel documents|*.xlsx|Xml documents|*.xml";
 
         private const string DefaultFileName = "Users";
@@ -15,11 +14,11 @@ namespace WpfApp1.View.UI
         /// </summary>
         /// <param name="fileName"> Name of chosen file. </param>
         /// <returns></returns>
-        public bool OpenFileDialog(out string fileName)
+        public bool OpenFileDialog(out string fileName, string extensionFilter)
         {
             var openFileDialog = new OpenFileDialog();
 
-            openFileDialog.Filter = OpenFileExtensionFilter;
+            openFileDialog.Filter = extensionFilter;
             openFileDialog.Multiselect = false;
 
             bool? result = openFileDialog.ShowDialog();

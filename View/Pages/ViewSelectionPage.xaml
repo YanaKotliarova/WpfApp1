@@ -1,0 +1,81 @@
+﻿<Page x:Class="WpfApp1.View.Pages.ViewSelectionPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:WpfApp1.View.Pages"
+      
+      xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity" 
+      xmlns:Dialog="clr-namespace:MahApps.Metro.Controls.Dialogs;assembly=MahApps.Metro" 
+      xmlns:Controls="http://metro.mahapps.com/winfx/xaml/controls"
+      
+      xmlns:viewmodels="clr-namespace:WpfApp1.ViewModel.ViewModels"
+      d:DataContext="{d:DesignInstance Type=viewmodels:ViewSelectionPageViewModel}"
+      
+      Dialog:DialogParticipation.Register="{Binding}"      
+      
+      mc:Ignorable="d" 
+      d:DesignHeight="450" d:DesignWidth="800"
+      Title="ViewingPage">
+
+    <Page.Resources>
+        <BooleanToVisibilityConverter x:Key="boolToVisibilityConverter"/>
+    </Page.Resources>
+
+    <Grid Background="White">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="70"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="50"/>
+        </Grid.RowDefinitions>
+
+        <Button Content="Назад" Grid.Row="0"
+                Command="NavigationCommands.BrowseBack" 
+                Padding="3" MinHeight="25" MinWidth="35"
+                HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,10,0,0"/>
+
+        <ListView Language="ru-RU" Name="ListViewForUsers" Grid.Row="1" Margin="40,0,40,0"
+                  ItemsSource="{Binding UsersCollection}"
+                  ScrollViewer.CanContentScroll="True" BorderThickness="2,2,2,2">
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn Header="Дата" DisplayMemberBinding="{Binding Path=Date}" Width="100"/>
+                    <GridViewColumn Header="Имя" DisplayMemberBinding="{Binding Path=FirstName}" Width="100"/>
+                    <GridViewColumn Header="Фамилия" DisplayMemberBinding="{Binding Path=LastName}" Width="100"/>
+                    <GridViewColumn Header="Отчество" DisplayMemberBinding="{Binding Path=Patronymic}" Width="100"/>
+                    <GridViewColumn Header="Город" DisplayMemberBinding="{Binding Path=City}" Width="100"/>
+                    <GridViewColumn Header="Страна" DisplayMemberBinding="{Binding Path=Country}" Width="100"/>
+                </GridView>
+            </ListView.View>
+        </ListView>
+
+        <StackPanel Grid.Row="2" Orientation="Horizontal" Height="25" HorizontalAlignment="Right" Margin="0,0,40,0">
+            <Button Content="&lt;&lt;" Margin="5,0,5,0" FontWeight="Bold" Width="40" 
+                    IsEnabled="{Binding IsFirstEnable}" Command="{Binding FirstCommand}"/>
+            <Button Content="&lt;" Margin="5,0,5,0" FontWeight="Bold" Width="40" 
+                    IsEnabled="{Binding IsPreviousEnable}" Command="{Binding PreviousCommand}"/>
+            <TextBlock VerticalAlignment="Center">
+                <TextBlock.Text>
+                    <MultiBinding StringFormat="{} {0} из {1}">
+                        <Binding Path="CurrentPage"/>
+                        <Binding Path="NumberOfPages"/>
+                    </MultiBinding>
+                </TextBlock.Text>
+            </TextBlock>
+            <Button Content=">" Margin="5,0,5,0" FontWeight="Bold" Width="40" 
+                    IsEnabled="{Binding IsNextEnable}" Command="{Binding NextCommand}"/>
+            <Button Content=">>" Margin="5,0,0,0" FontWeight="Bold" Width="40" 
+                    IsEnabled="{Binding IsLastEnable}" Command="{Binding LastCommand}"/>
+        </StackPanel>
+    </Grid>
+
+    <i:Interaction.Triggers>
+        <i:EventTrigger EventName="Loaded">
+            <i:InvokeCommandAction Command="{Binding ShowSelectionCommand}" />
+        </i:EventTrigger>
+        <i:EventTrigger EventName="Unloaded">
+            <i:InvokeCommandAction Command="{Binding CloseViewingPageCommand}" />
+        </i:EventTrigger>
+    </i:Interaction.Triggers>
+
+</Page>

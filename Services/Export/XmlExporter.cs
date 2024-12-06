@@ -10,7 +10,7 @@ namespace WpfApp1.Services.Export
 
         private const string UsersWord = "Users";
         private const string UserWord = "User";
-        private const string IdWord = "ID";
+        private const string IdWord = "Id";
         private const string DateWord = "Date";
         private const string FirstNameWord = "FirstName";
         private const string LastNameWord = "LastName";
@@ -26,11 +26,11 @@ namespace WpfApp1.Services.Export
         public async Task CreateFileAsync(string xmlFileName)
         {
 
-            XDocument xDoc = new XDocument();
+            XDocument xmlDocument = new XDocument();
             XElement users = new XElement(UsersWord);
-            xDoc.Add(users);
+            xmlDocument.Add(users);
 
-            await Task.Factory.StartNew(() => xDoc.Save(xmlFileName));
+            await Task.Factory.StartNew(() => xmlDocument.Save(xmlFileName));
         }
 
         /// <summary>
@@ -46,14 +46,15 @@ namespace WpfApp1.Services.Export
                 throw new Exception("Выборка не была осуществена!\r\nПроверьте введённые данные.");
 
 
-            XDocument xDoc = XDocument.Load(xmlFileName);
-            XElement? root = xDoc.Element(UsersWord);
+            XDocument xmlDocument = XDocument.Load(xmlFileName);
+            XElement? root = xmlDocument.Element(UsersWord);
 
             if (root != null)
             {
                 foreach (User user in listOfUsersFromDB)
                 {
-                    XElement newUser = new XElement(UserWord + user.Id.ToString());
+                    XElement newUser = new XElement(UserWord);
+                    XAttribute newUserId = new XAttribute(IdWord, user.Id.ToString());
                     XElement newUserDate = new XElement(DateWord, user.Date);
                     XElement newUserFirstName = new XElement(FirstNameWord, user.FirstName);
                     XElement newUserLastName = new XElement(LastNameWord, user.LastName);
@@ -61,10 +62,10 @@ namespace WpfApp1.Services.Export
                     XElement newUserCity = new XElement(CityWord, user.City);
                     XElement newUserCountry = new XElement(CountryWord, user.Country);
 
-                    newUser.Add(newUserDate, newUserFirstName, newUserLastName, newUserPatronymic, newUserCity, newUserCountry);
+                    newUser.Add(newUserId, newUserDate, newUserFirstName, newUserLastName, newUserPatronymic, newUserCity, newUserCountry);
                     root.Add(newUser);
                 }
-                await Task.Factory.StartNew(() => xDoc.Save(xmlFileName));
+                await Task.Factory.StartNew(() => xmlDocument.Save(xmlFileName));
                 listOfUsersFromDB.Clear();
             }
         }

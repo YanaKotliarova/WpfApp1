@@ -1,25 +1,54 @@
 ﻿using WpfApp1.Data.Database.Interfaces;
 using WpfApp1.Model;
 using WpfApp1.MVVM;
-using WpfApp1.Services.Import;
 using WpfApp1.View.UI.Interfaces;
+using WpfApp1.ViewModel.Events;
+using WpfApp1.ViewModel.Factories;
 
 namespace WpfApp1.ViewModel.ViewModels
 {
     class ImportPageViewModel : ViewModelBase
     {
-        private readonly IDataImporter _importer;
+        private const string DefaultImportTextBoxMessage = "Выберите, пожалуйста, файл для импорта.";
+        private const string CsvImporterName = "CsvImporter";
+        private const string OpenFileExtensionFilter = "Special text files (*.csv) | *.csv";
+
+        private readonly IImporterFactory _importer;
         private readonly IRepository<User> _repository;
         private readonly IFileDialog _fileDialog;
         private readonly IMetroDialog _metroDialog;
+        private readonly IEventAggregator _eventAggregator;
 
-        public ImportPageViewModel(IDataImporter importer, IRepository<User> repository, IFileDialog fileDialog,
-            IMetroDialog metroDialog)
+        public ImportPageViewModel(IImporterFactory importer, IRepository<User> repository, IFileDialog fileDialog,
+            IMetroDialog metroDialog, IEventAggregator eventAggregator)
         {
             _importer = importer;
             _repository = repository;
             _fileDialog = fileDialog;
             _metroDialog = metroDialog;
+            _eventAggregator = eventAggregator;
+
+            _eventAggregator.GetEvent<ImportExportAvailability>().Subscribe((state) => 
+            { 
+                IsProgressBarVisible = !state;
+            });
+        }
+
+        private RelayCommand _pageIsLoadedCommand;
+        /// <summary>
+        /// The command which is called when page is loaded and change text of main text box on export page.
+        /// </summary>
+        public RelayCommand PageIsLoadedCommand
+        {
+            get
+            {
+                return _pageIsLoadedCommand ??
+                    (_pageIsLoadedCommand = new RelayCommand(obj =>
+                    {
+                        if (_repository.IsDBAvailable)
+                            ImportText = DefaultImportTextBoxMessage;
+                    }));
+            }
         }
 
         private RelayCommand _readCsvFileAndAddToBDCommand;
@@ -38,29 +67,27 @@ namespace WpfApp1.ViewModel.ViewModels
                         {
                             try
                             {
-                                if (_fileDialog.OpenFileDialog(out string fileName))
+                                if (_fileDialog.OpenFileDialog(out string fileName, OpenFileExtensionFilter))
                                 {
-                                    DisplayProgressBar = true;
                                     _repository.IsDBAvailable = false;
-
-                                    IsButtonEnable = false;
 
                                     ImportText = "Открытие файла и перенос данных могут занять некоторое время...";
 
-                                    await foreach (List<User> listOfUsers in _importer.ReadFromFileAsync(fileName))
-                                    {
-                                        await _repository.AddToDBAsync(listOfUsers);
-                                        listOfUsers.Clear();
-                                    }
+                                    var fileImporter = _importer.GetImporter(CsvImporterName);
 
-                                    DisplayProgressBar = false;
+                                    await Task.Run(async () =>
+                                    {
+                                        await foreach (List<User> listOfUsers in fileImporter.ReadFromFileAsync(fileName))
+                                        {
+                                            await _repository.AddToDBAsync(listOfUsers);
+                                        }
+                                    });                                    
+
                                     _repository.IsDBAvailable = true;
 
-                                    IsButtonEnable = true;
-
-                                    var viewModel = _metroDialog.ReturnViewModel();
-                                    await _metroDialog.ShowMessage(viewModel, "Импорт завершен!",
-                                        "Данные загружены в базу даных и готовы к экспорту.");
+                                    //var viewModel = _metroDialog.ReturnViewModel();
+                                    //await _metroDialog.ShowMessage(viewModel, "Импорт завершен!",
+                                    //    "Данные загружены в базу даных и готовы к экспорту.");
 
                                     ImportText = "Данные загружены в базу даных и готовы к экспорту.";
                                 }
@@ -69,10 +96,8 @@ namespace WpfApp1.ViewModel.ViewModels
                             {
                                 var viewModel = _metroDialog.ReturnViewModel();
                                 await _metroDialog.ShowMessage(viewModel, "Ошибка", ex.Message);
-                                DisplayProgressBar = false;
-                                _repository.IsDBAvailable = true;
 
-                                IsButtonEnable = true;
+                                _repository.IsDBAvailable = true;
                             }
                         }
                         else
@@ -80,12 +105,11 @@ namespace WpfApp1.ViewModel.ViewModels
                             await _metroDialog.ShowMessage(this, "Пожалуйста, подождите!",
                             "Еще не закончилась предыдущая операция. Повторите попытку позже.");
                         }
-                    }
-                    ));
+                    }, x => _repository.IsDBAvailable));
             }
         }
 
-        private string _importTextBoxText = "Выберите, пожалуйста, файл для импорта.";
+        private string _importTextBoxText;
         /// <summary>
         /// A property associated with the text field used to display information.
         /// </summary>
@@ -99,31 +123,17 @@ namespace WpfApp1.ViewModel.ViewModels
             }
         }
 
-        private bool _isButtonEnable = true;
-        /// <summary>
-        /// A property associated with an IsEnable property of import button.
-        /// </summary>
-        public bool IsButtonEnable
-        {
-            get { return _isButtonEnable; }
-            set
-            {
-                _isButtonEnable = value;
-                OnPropertyChanged(nameof(IsButtonEnable));
-            }
-        }
-
-        private bool _displayProgressBar = false;
+        private bool _isProgressBarVisible;
         /// <summary>
         /// A property associated with an IsVisible property of progress bar.
         /// </summary>
-        public bool DisplayProgressBar
+        public bool IsProgressBarVisible
         {
-            get { return _displayProgressBar; }
+            get { return _isProgressBarVisible; }
             set
             {
-                _displayProgressBar = value;
-                OnPropertyChanged(nameof(DisplayProgressBar));
+                _isProgressBarVisible = value;
+                OnPropertyChanged(nameof(IsProgressBarVisible));
             }
         }
     }

@@ -2,7 +2,8 @@
 {
     internal interface IDataFormatter
     {
-        string FormateDate(DateTime? dateTime);
+        string FormateDateOnly(DateOnly? dateOnly);
+        DateOnly? FormateDateTime(DateTime? dateTime);
         string FormateStringData(string data);
     }
 }

@@ -2,7 +2,7 @@
 {
     internal interface IFileDialog
     {
-        bool OpenFileDialog(out string fileName);
+        bool OpenFileDialog(out string fileName, string extensionFilter);
         bool SaveFileDialog(out string fileName);
     }
 }

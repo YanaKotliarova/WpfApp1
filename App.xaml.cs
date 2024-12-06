@@ -4,7 +4,6 @@ using System.Windows;
 using WpfApp1.Data.Database;
 using WpfApp1.Data.Database.Interfaces;
 using WpfApp1.Model;
-using WpfApp1.Services.Import;
 using WpfApp1.View.UI;
 using WpfApp1.View.UI.Interfaces;
 using WpfApp1.ViewModel.DependencyInjection;
@@ -45,12 +44,15 @@ namespace WpfApp1
             services.AddSingleton<MainWindowViewModel>();
             services.AddSingleton<ExportPageViewModel>();
             services.AddSingleton<ImportPageViewModel>();
-            services.AddSingleton<ViewingPageViewModel>();
+            services.AddSingleton<ViewSelectionPageViewModel>();
+            services.AddSingleton<ViewFilePageViewModel>();
             services.AddSingleton<MenuPageViewModel>();
             services.AddSingleton<EnterConnectionStringPageViewModel>();
 
+            services.AddSingleton<IEventAggregator, EventAggregator>();
+
             services.AddExporterFactory();
-            services.AddSingleton<IDataImporter, CsvImporter>();
+            services.AddImporterFactory();
             services.AddScoped<IRepository<User>, DataBase>();
             services.AddTransient<IDataFormatter, DataFormatter>();
             services.AddTransient<IConnectionStringValidation, ConnectionStringValidation>();
@@ -61,6 +63,7 @@ namespace WpfApp1
             using (serviceProvider = services.BuildServiceProvider())
             {
                 App app = new App();
+                app.ShutdownMode = ShutdownMode.OnLastWindowClose;
                 MainWindow window = new MainWindow();
                 window.Title = "CSV EXPORTER";
                 Current.Resources = app.MetroResources;

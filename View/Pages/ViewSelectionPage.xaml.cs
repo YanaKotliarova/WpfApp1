@@ -4,12 +4,12 @@ using WpfApp1.ViewModel.ViewModels;
 
 namespace WpfApp1.View.Pages
 {
-    public partial class ViewingPage : Page
+    public partial class ViewSelectionPage : Page
     {
-        public ViewingPage()
+        public ViewSelectionPage()
         {
             InitializeComponent();
-            DataContext = App.serviceProvider.GetService<ViewingPageViewModel>();
+            DataContext = App.serviceProvider.GetService<ViewSelectionPageViewModel>();
         }
     }
 }

@@ -24,6 +24,18 @@ namespace WpfApp1.View.UI
             await _dialogCoordinator.ShowMessageAsync(viewModel, header, message);
         }
 
+        public async Task<ProgressDialogController> ShowMessageWithProgressBar(object viewModel, string header, string message)
+        {
+            ProgressDialogController controller = await _dialogCoordinator.ShowProgressAsync(viewModel, header, message);
+            controller.SetIndeterminate();
+            return controller;
+        }
+
+        public async Task CloseShowMessageWithProgressBar(ProgressDialogController controller)
+        {
+            await controller.CloseAsync();
+        }
+
         /// <summary>
         /// The method for returning viewmodel of the current open page.
         /// </summary>

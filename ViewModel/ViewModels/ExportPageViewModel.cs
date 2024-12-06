@@ -3,6 +3,7 @@ using WpfApp1.Data.Database.Interfaces;
 using WpfApp1.Model;
 using WpfApp1.MVVM;
 using WpfApp1.View.UI.Interfaces;
+using WpfApp1.ViewModel.Events;
 using WpfApp1.ViewModel.Factories.Interfaces;
 
 namespace WpfApp1.ViewModel.ViewModels
@@ -15,22 +16,29 @@ namespace WpfApp1.ViewModel.ViewModels
         private const string ExcelExporterName = "ExcelExporter";
         private const string XmlExporterName = "XmlExporter";
 
-        private const string DefaultExportTextBoxMessage = "Введите данные для выборки, выберите тип файла, а затем нажмите кнопку экспорта.";
+        private const string DefaultExportTextBoxMessage = "Введите данные для выборки, а затем нажмите кнопку экспорта.";
 
         private readonly IExporterFactory _exporter;
         private readonly IRepository<User> _repository;
         private readonly IDataFormatter _dataFormatter;
         private readonly IFileDialog _fileDialog;
         private readonly IMetroDialog _metroDialog;
+        private readonly IEventAggregator _eventAggregator;
 
         public ExportPageViewModel(IExporterFactory exporter, IRepository<User> repository, IDataFormatter dataFormatter,
-            IFileDialog fileDialog, IMetroDialog metroDialog)
+            IFileDialog fileDialog, IMetroDialog metroDialog, IEventAggregator eventAggregator)
         {
             _exporter = exporter;
             _repository = repository;
             _dataFormatter = dataFormatter;
             _fileDialog = fileDialog;
             _metroDialog = metroDialog;
+            _eventAggregator = eventAggregator;
+
+            _eventAggregator.GetEvent<ImportExportAvailability>().Subscribe((state) =>
+            {
+                IsProgressBarVisible = !state;
+            });
         }
 
         private RelayCommand _pageIsLoadedCommand;
@@ -44,7 +52,8 @@ namespace WpfApp1.ViewModel.ViewModels
                 return _pageIsLoadedCommand ??
                     (_pageIsLoadedCommand = new RelayCommand(obj =>
                     {
-                        ExportText = DefaultExportTextBoxMessage;
+                        if (_repository.IsDBAvailable)
+                            ExportText = DefaultExportTextBoxMessage;
                     }));
             }
         }
@@ -73,12 +82,10 @@ namespace WpfApp1.ViewModel.ViewModels
                                 {
                                     ExportText = "Экспорт может занять некоторое время, пожалуйста подождите...";
 
-                                    DisplayProgressBar = true;
                                     _repository.IsDBAvailable = false;
+                                    _repository.WasExport = false;
 
-                                    IsButtonEnable = false;
-
-                                    string date = _dataFormatter.FormateDate(DatePicker);
+                                    DateOnly? date = _dataFormatter.FormateDateTime(DatePicker);
                                     DatePicker = null;
 
                                     string firstName = _dataFormatter.FormateStringData(FirstNameTextBox);
@@ -111,12 +118,11 @@ namespace WpfApp1.ViewModel.ViewModels
                                         }
                                     });
 
-                                    DisplayProgressBar = false;
                                     _repository.IsDBAvailable = true;
-                                    IsButtonEnable = true;
+                                    _repository.WasExport = true;
 
                                     var viewModel = _metroDialog.ReturnViewModel();
-                                    await _metroDialog.ShowMessage(viewModel, "Экспорт завершён!", 
+                                    await _metroDialog.ShowMessage(viewModel, "Экспорт завершён!",
                                         "Файл " + newFileName + " был успешно создан.");
 
                                     ExportText = $"Созданную выборку можно увидеть в созданном файле: \"{newFileName}\" " +
@@ -127,15 +133,14 @@ namespace WpfApp1.ViewModel.ViewModels
                             {
                                 var viewModel = _metroDialog.ReturnViewModel();
                                 await _metroDialog.ShowMessage(viewModel, "При создании файла произошла ошибка", ex.Message);
-                                DisplayProgressBar = false;
-                                _repository.IsDBAvailable = true;
 
-                                IsButtonEnable = true;
+                                _repository.IsDBAvailable = true;
+                                _repository.WasExport = false;
                             }
                         }
                         else await _metroDialog.ShowMessage(this, "Пожалуйста, подождите!",
                             "Еще не закончилась предыдущая операция. Повторите попытку позже.");
-                    }));
+                    }, x => _repository.IsDBAvailable));
             }
         }
 
@@ -153,31 +158,17 @@ namespace WpfApp1.ViewModel.ViewModels
             }
         }
 
-        private bool _isButtonEnable = true;
-        /// <summary>
-        /// A property associated with an IsEnable property of export button.
-        /// </summary>
-        public bool IsButtonEnable
-        {
-            get { return _isButtonEnable; }
-            set
-            {
-                _isButtonEnable = value;
-                OnPropertyChanged(nameof(IsButtonEnable));
-            }
-        }
-
-        private bool _displayProgressBar = false;
+        private bool _isProgressBarVisible;
         /// <summary>
         /// A property associated with an IsVisible property of progress bar.
         /// </summary>
-        public bool DisplayProgressBar
+        public bool IsProgressBarVisible
         {
-            get { return _displayProgressBar; }
+            get { return _isProgressBarVisible; }
             set
             {
-                _displayProgressBar = value;
-                OnPropertyChanged(nameof(DisplayProgressBar));
+                _isProgressBarVisible = value;
+                OnPropertyChanged(nameof(IsProgressBarVisible));
             }
         }
 

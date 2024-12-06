@@ -6,6 +6,7 @@ namespace WpfApp1.Data.Database.Interfaces
         where T : class
     {
         bool IsDBAvailable { get; set; }
+        bool WasExport { get; set; }
         bool IsDBEmpty { get; set; }
         PersonInfoStruct? PersonInfo { get; set; }
         EntranceInfoStruct? EntranceInfo { get; set; }
