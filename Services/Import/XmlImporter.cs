@@ -5,15 +5,6 @@ namespace WpfApp1.Services.Import
 {
     class XmlImporter : IDataImporter
     {
-        private const string UsersWord = "Users";
-        private const string UserWord = "User";
-        private const string DateWord = "Date";
-        private const string FirstNameWord = "FirstName";
-        private const string LastNameWord = "LastName";
-        private const string PatronymicWord = "Patronymic";
-        private const string CityWord = "City";
-        private const string CountryWord = "Country";
-
         private const int AmountOfUsersToRead = 10000;
 
         public string ImporterName { get; set; } = "XmlImporter";
@@ -28,21 +19,21 @@ namespace WpfApp1.Services.Import
             List<User> users = new List<User>();
 
             XDocument xmlDocument = XDocument.Load(fileName);
-            XElement? root = xmlDocument.Element(UsersWord);
+            XElement? root = xmlDocument.Element(Properties.Resources.UsersWord);
 
             if (root != null)
             {
-                foreach (XElement node in root.Elements(UserWord))
+                foreach (XElement node in root.Elements(Properties.Resources.UserWord))
                 {
                     PersonInfoStruct personInfo = new PersonInfoStruct(
-                        node.Element(FirstNameWord)!.Value,
-                        node.Element(LastNameWord)!.Value,
-                        node.Element(PatronymicWord)!.Value);
+                        node.Element(Properties.Resources.FirstNameWord)!.Value,
+                        node.Element(Properties.Resources.LastNameWord)!.Value,
+                        node.Element(Properties.Resources.PatronymicWord)!.Value);
 
                     EntranceInfoStruct entranceInfo = new EntranceInfoStruct(
-                        DateOnly.Parse(node.Element(DateWord)!.Value),
-                        node.Element(CityWord)!.Value,
-                        node.Element(CountryWord)!.Value);
+                        DateOnly.Parse(node.Element(Properties.Resources.DateWord)!.Value),
+                        node.Element(Properties.Resources.CityWord)!.Value,
+                        node.Element(Properties.Resources.CountryWord)!.Value);
 
                     User user = new User(personInfo, entranceInfo);
                     users.Add(user);

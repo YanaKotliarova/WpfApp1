@@ -15,8 +15,6 @@ namespace WpfApp1.ViewModel.ViewModels
         private const string XmlExtension = ".xml";
         private const string ExcelExtension = ".xlsx";
 
-        private const string OpenFileExtensionFilter = "Excel documents|*.xlsx|Xml documents|*.xml";
-
         private readonly IImporterFactory _importer;
         private readonly IMetroDialog _metroDialog;
         private readonly IFileDialog _fileDialog;
@@ -37,7 +35,7 @@ namespace WpfApp1.ViewModel.ViewModels
             {
                 var fileImporter = GetDataImporter();
                 var metroDialogController = await _metroDialog.ShowMessageWithProgressBar(this,
-                                    "Пожалуйста подождите!", "Данные подгружаются...");
+                                    Properties.Resources.HeaderWaitPlease, Properties.Resources.DataIsLoading);
                 await Task.Run(async () =>
                 {
                     await foreach (List<User> listOfUsers in fileImporter.ReadFromFileAsync(FileName))
@@ -49,11 +47,8 @@ namespace WpfApp1.ViewModel.ViewModels
             }
             catch (Exception)
             {
-                await _metroDialog.ShowMessage(this, "При открытии файла произошла ошибка!",
-                    "Убедитесь что:\r\n" +
-                    "1) файл не открыт в другом приложении\r\n" +
-                    "2) это один из созданных вами файлов\r\n" +
-                    "3) файл не повреждён");
+                await _metroDialog.ShowMessage(Properties.Resources.HeadetOpenFileEx,
+                    Properties.Resources.OpenFileForViewEx);
             }
         }
 
@@ -61,7 +56,7 @@ namespace WpfApp1.ViewModel.ViewModels
         /// The method for getting needed type of file importer.
         /// </summary>
         /// <returns></returns>
-        /// <exception cref="Throw an exeption 'Неверный формат файла' when choodes file is in the wrong format.">  </exception>
+        /// <exception cref="Exception"></exception>
         public IDataImporter GetDataImporter()
         {
             if (Path.GetExtension(FileName).Equals(ExcelExtension))
@@ -74,7 +69,7 @@ namespace WpfApp1.ViewModel.ViewModels
                 var fileImporter = _importer.GetImporter(XmlImporterName);
                 return fileImporter;
             }
-            else throw new Exception("Неверный формат файла");
+            else throw new Exception(Properties.Resources.ExWrongFileFormat);
         }
 
         private RelayCommand _openFileCommand;
@@ -90,7 +85,7 @@ namespace WpfApp1.ViewModel.ViewModels
                     {
                         try
                         {
-                            if (_fileDialog.OpenFileDialog(out string fileName, OpenFileExtensionFilter))
+                            if (_fileDialog.OpenFileDialog(out string fileName, Properties.Resources.OpenExcelXmlFileExtensionFilter))
                             {
                                 ListOfUsersForViewing.Clear();
                                 FileName = fileName;
@@ -99,7 +94,8 @@ namespace WpfApp1.ViewModel.ViewModels
                         }
                         catch (Exception ex)
                         {
-                            await _metroDialog.ShowMessage(this, "При открытии файла произошла ошибка!", "Вы не выбрали файл");
+                            await _metroDialog.ShowMessage(Properties.Resources.HeadetOpenFileEx, 
+                                Properties.Resources.ChooseFileEx);
                         }
                     }
                     ));

@@ -23,7 +23,7 @@ namespace WpfApp1.ViewModel.ViewModels
             try
             {
                 var metroDialogController = await _metroDialog.ShowMessageWithProgressBar(this,
-                                    "Пожалуйста подождите!", "Данные подгружаются...");
+                                    Properties.Resources.HeaderWaitPlease, Properties.Resources.DataIsLoading);
                 await Task.Run(async () =>
                 {
                     await foreach (List<User> listOfUsers in
@@ -36,7 +36,8 @@ namespace WpfApp1.ViewModel.ViewModels
             }
             catch (Exception ex)
             {
-                await _metroDialog.ShowMessage(this, "При создании выборки произошла непредвиденная ошибка", "Попробуйте снова");
+                await _metroDialog.ShowMessage(Properties.Resources.HeaderUnexpectedSelectionEx, 
+                    Properties.Resources.HeaderTryAgain);
             }
         }
     }

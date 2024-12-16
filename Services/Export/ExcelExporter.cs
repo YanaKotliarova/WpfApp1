@@ -6,12 +6,12 @@ namespace WpfApp1.Services.Export
 {
     internal class ExcelExporter : IDataExporter
     {
-        private const string WorksheetWord = "Лист1";
-
         public string ExporterName { get; set; } = "ExcelExporter";
 
+        private const string IdWord = "Id";
+
         /// <summary>
-        /// Asynchronous method for creating an Excel file.
+        /// Asynchronous method for creating an Excel file and adding a header row.
         /// </summary>
         /// <param name="excelFileName"> Name of file to be created. </param>
         /// <returns></returns>
@@ -21,7 +21,17 @@ namespace WpfApp1.Services.Export
 
             using (ExcelPackage excelPackage = new ExcelPackage())
             {
-                excelPackage.Workbook.Worksheets.Add(WorksheetWord);   
+                ExcelWorksheet worksheet = excelPackage.Workbook.Worksheets.Add(Properties.Resources.WorksheetWord);
+
+                List<string[]> headerRow = new List<string[]>()
+                {
+                    new string[] { IdWord, Properties.Resources.DateWord, Properties.Resources.FirstNameWord,
+                        Properties.Resources.LastNameWord, Properties.Resources.PatronymicWord,
+                        Properties.Resources.CityWord, Properties.Resources.CountryWord }
+                };
+
+                worksheet.Cells["A1"].LoadFromArrays(headerRow);
+
                 FileInfo excelFile = new FileInfo(excelFileName);
                 await excelPackage.SaveAsAsync(excelFile);
             }
@@ -40,17 +50,10 @@ namespace WpfApp1.Services.Export
 
             using (ExcelPackage excelPackage = new ExcelPackage(excelFileName))
             {
-                int rows = 1;
-                bool IsHeaderNeeded = true;
                 ExcelWorksheet worksheet = excelPackage.Workbook.Worksheets.FirstOrDefault()!;
+                int rows = worksheet.Dimension.Rows + 1;
 
-                if (worksheet.Dimension != null)
-                {
-                    rows = worksheet.Dimension.Rows + 1;
-                    IsHeaderNeeded = false;
-                }
-
-                worksheet.Cells[rows, 1].LoadFromCollection(listOfUsersFromDB, IsHeaderNeeded);
+                worksheet.Cells[rows, 1].LoadFromCollection(listOfUsersFromDB);
 
                 worksheet.Columns.AutoFit();
 

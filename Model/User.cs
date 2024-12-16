@@ -1,5 +1,4 @@
 ﻿using OfficeOpenXml.Attributes;
-using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using WpfApp1.Model.Interfaces;
 
@@ -10,18 +9,23 @@ namespace WpfApp1.Model
         [Key]
         [EpplusTableColumn(NumberFormat = "0")]
         public int Id { get; set; }
-        [DisplayName("Дата")]
-        [EpplusTableColumn(NumberFormat = "dd/mm/yyyy")]
+
+        [EpplusTableColumn(Header = "Дата", NumberFormat = "dd/mm/yyyy")]
         public DateOnly? Date { get; set; }
-        [DisplayName("Имя")]
+
+        [EpplusTableColumn(Header = "Имя")]
         public string FirstName { get; set; }
-        [DisplayName("Фамилия")]
+
+        [EpplusTableColumn(Header = "Фамилия")]
         public string LastName { get; set; }
-        [DisplayName("Отчество")]
+
+        [EpplusTableColumn(Header = "Отчество")]
         public string Patronymic { get; set; }
-        [DisplayName("Город")]
+
+        [EpplusTableColumn(Header = "Город")]
         public string City { get; set; }
-        [DisplayName("Страна")]
+
+        [EpplusTableColumn(Header = "Страна")]
         public string Country { get; set; }
 
         public User() { }

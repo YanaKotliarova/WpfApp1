@@ -8,15 +8,7 @@ namespace WpfApp1.Services.Export
     {
         public string ExporterName { get; set; } = "XmlExporter";
 
-        private const string UsersWord = "Users";
-        private const string UserWord = "User";
         private const string IdWord = "Id";
-        private const string DateWord = "Date";
-        private const string FirstNameWord = "FirstName";
-        private const string LastNameWord = "LastName";
-        private const string PatronymicWord = "Patronymic";
-        private const string CityWord = "City";
-        private const string CountryWord = "Country";
 
         /// <summary>
         /// Asynchronous method for creating an Xml file.
@@ -27,7 +19,7 @@ namespace WpfApp1.Services.Export
         {
 
             XDocument xmlDocument = new XDocument();
-            XElement users = new XElement(UsersWord);
+            XElement users = new XElement(Properties.Resources.UsersWord);
             xmlDocument.Add(users);
 
             await Task.Factory.StartNew(() => xmlDocument.Save(xmlFileName));
@@ -42,25 +34,21 @@ namespace WpfApp1.Services.Export
         /// <returns></returns>
         public async Task AddToFileAsync(string xmlFileName, List<User> listOfUsersFromDB)
         {
-            if (listOfUsersFromDB.IsNullOrEmpty())
-                throw new Exception("Выборка не была осуществена!\r\nПроверьте введённые данные.");
-
-
             XDocument xmlDocument = XDocument.Load(xmlFileName);
-            XElement? root = xmlDocument.Element(UsersWord);
+            XElement? root = xmlDocument.Element(Properties.Resources.UsersWord);
 
             if (root != null)
             {
                 foreach (User user in listOfUsersFromDB)
                 {
-                    XElement newUser = new XElement(UserWord);
+                    XElement newUser = new XElement(Properties.Resources.UserWord);
                     XAttribute newUserId = new XAttribute(IdWord, user.Id.ToString());
-                    XElement newUserDate = new XElement(DateWord, user.Date);
-                    XElement newUserFirstName = new XElement(FirstNameWord, user.FirstName);
-                    XElement newUserLastName = new XElement(LastNameWord, user.LastName);
-                    XElement newUserPatronymic = new XElement(PatronymicWord, user.Patronymic);
-                    XElement newUserCity = new XElement(CityWord, user.City);
-                    XElement newUserCountry = new XElement(CountryWord, user.Country);
+                    XElement newUserDate = new XElement(Properties.Resources.DateWord, user.Date);
+                    XElement newUserFirstName = new XElement(Properties.Resources.FirstNameWord, user.FirstName);
+                    XElement newUserLastName = new XElement(Properties.Resources.LastNameWord, user.LastName);
+                    XElement newUserPatronymic = new XElement(Properties.Resources.PatronymicWord, user.Patronymic);
+                    XElement newUserCity = new XElement(Properties.Resources.CityWord, user.City);
+                    XElement newUserCountry = new XElement(Properties.Resources.CountryWord, user.Country);
 
                     newUser.Add(newUserId, newUserDate, newUserFirstName, newUserLastName, newUserPatronymic, newUserCity, newUserCountry);
                     root.Add(newUser);

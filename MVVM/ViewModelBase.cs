@@ -11,7 +11,7 @@ namespace WpfApp1.MVVM
         /// A method for taking into account changes 
         /// in the visual component of the application.
         /// </summary>
-        /// <param name="propertyName"> Имя компонента. </param>
+        /// <param name="propertyName"> Name of the component. </param>
         public void OnPropertyChanged([CallerMemberName] string propertyName = "")
         {
             if (PropertyChanged != null)

@@ -16,13 +16,12 @@ namespace WpfApp1.View.UI
         /// <summary>
         /// The method to show message in MetroMahapps dialog.
         /// </summary>
-        /// <param name="viewModel"> ViewModel for creating a bound. </param>
         /// <param name="header"> Header of dialog. </param>
         /// <param name="message"> Message of dialog. </param>
         /// <returns></returns>
-        public async Task ShowMessage(object viewModel, string header, string message)
+        public async Task ShowMessage(string header, string message)
         {
-            await _dialogCoordinator.ShowMessageAsync(viewModel, header, message);
+            await _dialogCoordinator.ShowMessageAsync(ReturnViewModel(), header, message);
         }
 
         /// <summary>

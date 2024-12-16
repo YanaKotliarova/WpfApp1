@@ -1,14 +1,20 @@
-﻿using System.Windows.Navigation;
+﻿using System.Collections.ObjectModel;
+using System.Globalization;
+using System.Resources;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Navigation;
 using WpfApp1.Data.Database.Interfaces;
 using WpfApp1.Model;
 using WpfApp1.MVVM;
+using WpfApp1.Properties;
 using WpfApp1.View.UI.Interfaces;
 using WpfApp1.ViewModel.Events;
 
 namespace WpfApp1.ViewModel.ViewModels
 {
     class MenuPageViewModel : ViewModelBase
-    {      
+    {
         private readonly IRepository<User> _repository;
         private readonly IMetroDialog _metroDialog;
         private readonly IEventAggregator _eventAggregator;
@@ -19,9 +25,11 @@ namespace WpfApp1.ViewModel.ViewModels
             _metroDialog = metroDialog;
             _eventAggregator = eventAggregator;
 
-            _eventAggregator.GetEvent<ExportingAvailability>().Subscribe(state => { IsExportAvailable = !state; });
+            _eventAggregator.GetEvent<ExportingAvailabilityEvent>().Subscribe(state => { IsExportAvailable = !state; });
 
-            _eventAggregator.GetEvent<ViewingAvailability>().Subscribe(state => { IsViewingAvailable = state; });
+            _eventAggregator.GetEvent<ViewingAvailabilityEvent>().Subscribe(state => { IsViewingAvailable = state; });
+
+            GetLanguages();
         }
 
         private RelayCommand _openPageCommand;
@@ -46,8 +54,7 @@ namespace WpfApp1.ViewModel.ViewModels
                         }
                         catch (Exception ex)
                         {
-                            var viewModel = _metroDialog.ReturnViewModel();
-                            await _metroDialog.ShowMessage(viewModel, "Ошибка при переходе на страницу", ex.Message);
+                            await _metroDialog.ShowMessage(Properties.Resources.HeaderOpenPageEx, ex.Message);
                         }
                     }));
             }
@@ -68,13 +75,91 @@ namespace WpfApp1.ViewModel.ViewModels
                         {
                             IsExportAvailable = !_repository.IsDBEmpty;
                         }
-                        catch (Exception ex) 
+                        catch (Exception ex)
                         {
-                            var viewModel = _metroDialog.ReturnViewModel();
-                            await _metroDialog.ShowMessage(viewModel, "Возникла непредвиденная ошибка", ex.Message);
+                            await _metroDialog.ShowMessage(Properties.Resources.HeaderUnexpectedEx, ex.Message);
                         }
                     }
                     ));
+            }
+        }
+
+        /// <summary>
+        /// The method for adding available languages into created collection.
+        /// </summary>
+        private void GetLanguages()
+        {
+            ResourceManager rm = new ResourceManager(typeof(Resources));
+            CultureInfo[] cultures = CultureInfo.GetCultures(CultureTypes.NeutralCultures);
+            foreach (CultureInfo culture in cultures)
+            {
+                ResourceSet rs = rm.GetResourceSet(culture, true, false);
+
+                if (rs != null)
+                {
+                    if (culture.Equals(CultureInfo.InvariantCulture))
+                    {
+                        Languages.Add(new CultureInfo("ru"));
+                    }
+                    else
+                    {
+                        Languages.Add(culture);
+                    }
+                }
+            }           
+
+            Language = SetLanguageChanger();
+        }
+
+        /// <summary>
+        /// The method for setting default value of ComboBox with available languages.
+        /// </summary>
+        /// <returns></returns>
+        private CultureInfo SetLanguageChanger()
+        {
+            CultureInfo currentCultureInfo;
+            CultureInfo cultureInfo = new CultureInfo(CultureInfo.CurrentUICulture.TwoLetterISOLanguageName);
+
+            if (Languages.Contains(cultureInfo))
+                currentCultureInfo = new CultureInfo(CultureInfo.CurrentUICulture.TwoLetterISOLanguageName);
+            else currentCultureInfo = new CultureInfo("ru");
+
+            return currentCultureInfo;
+        }
+
+
+        private ObservableCollection<CultureInfo> _languages = new ObservableCollection<CultureInfo>();
+        /// <summary>
+        /// A property for creating collection of languages that the application has been translated into.
+        /// </summary>
+        public ObservableCollection<CultureInfo> Languages
+        {
+            get { return _languages; }
+            set
+            {
+                _languages = value;
+                OnPropertyChanged(nameof(Languages));
+            }
+        }
+
+        private CultureInfo _language;
+        /// <summary>
+        /// A property associated with SelectedItem property of ComboBox for choosing language.
+        /// Changes the language of the application according to the selected item of ComboBox.
+        /// </summary>
+        public CultureInfo Language
+        {
+            get { return _language; }
+            set
+            {
+                _language = value;
+                OnPropertyChanged(nameof(Language));
+
+                Thread.CurrentThread.CurrentUICulture = value;
+
+                var window = Application.Current.Windows.OfType<Window>().SingleOrDefault(w => w.IsActive);
+                Frame frame = window.FindName("MainFrame") as Frame;
+                frame.Refresh();
             }
         }
 

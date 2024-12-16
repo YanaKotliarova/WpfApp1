@@ -5,8 +5,6 @@ namespace WpfApp1.View.UI
 {
     internal class FileDialog: IFileDialog
     {
-        private const string SaveFileExtensionFilter = "Excel documents|*.xlsx|Xml documents|*.xml";
-
         private const string DefaultFileName = "Users";
 
         /// <summary>
@@ -30,7 +28,7 @@ namespace WpfApp1.View.UI
             else
             {
                 fileName = "";
-                throw new Exception("Ошибка открытия файла");
+                throw new Exception(Properties.Resources.ExFileOpening);
             }
             return (bool)result;
         }
@@ -40,7 +38,7 @@ namespace WpfApp1.View.UI
             var saveFileDialog = new SaveFileDialog();
 
             saveFileDialog.FileName = DefaultFileName;
-            saveFileDialog.Filter = SaveFileExtensionFilter;
+            saveFileDialog.Filter = Properties.Resources.SaveFileExtensionFilter;
 
             bool? result = saveFileDialog.ShowDialog();
 
@@ -51,7 +49,7 @@ namespace WpfApp1.View.UI
             else
             {
                 fileName = "";
-                throw new Exception("Ошибка сохранения файла");
+                throw new Exception(Properties.Resources.ExFileSaving);
             }
             return (bool)result;
         }

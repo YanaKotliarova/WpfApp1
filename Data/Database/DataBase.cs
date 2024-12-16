@@ -34,7 +34,7 @@ namespace WpfApp1.Data.Database
             set
             {
                 _isDBAvailable = value;
-                _eventAggregator.GetEvent<ImportExportAvailability>().Publish(_isDBAvailable);
+                _eventAggregator.GetEvent<ImportExportAvailabilityEvent>().Publish(_isDBAvailable);
             }
         }
         private bool _isDBEmpty = true;
@@ -47,7 +47,7 @@ namespace WpfApp1.Data.Database
             set
             {
                 _isDBEmpty = value;
-                _eventAggregator.GetEvent<ExportingAvailability>().Publish(_isDBEmpty);
+                _eventAggregator.GetEvent<ExportingAvailabilityEvent>().Publish(_isDBEmpty);
             }
         }
 
@@ -61,7 +61,7 @@ namespace WpfApp1.Data.Database
             set
             {
                 _wasExport = value;
-                _eventAggregator.GetEvent<ViewingAvailability>().Publish(_wasExport);
+                _eventAggregator.GetEvent<ViewingAvailabilityEvent>().Publish(_wasExport);
             }
         }
 
@@ -78,7 +78,7 @@ namespace WpfApp1.Data.Database
         {
             db.SetConnectionString(connectionString);
             if (!_connectionStringValidation.ValidateConnectionString(connectionString))
-                throw new Exception("Не валидатная строка подключения к БД.");
+                throw new Exception(Properties.Resources.ExWrongConnectionString);
             await db.Database.MigrateAsync();
             IsDBAvailable = true;
             IsDBEmpty = CheckAreThereUsersInDB();

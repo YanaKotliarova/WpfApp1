@@ -9,9 +9,7 @@ namespace WpfApp1.ViewModel.ViewModels
 {
     class ImportPageViewModel : ViewModelBase
     {
-        private const string DefaultImportTextBoxMessage = "Выберите, пожалуйста, файл для импорта.";
         private const string CsvImporterName = "CsvImporter";
-        private const string OpenFileExtensionFilter = "Special text files (*.csv) | *.csv";
 
         private readonly IImporterFactory _importer;
         private readonly IRepository<User> _repository;
@@ -28,8 +26,8 @@ namespace WpfApp1.ViewModel.ViewModels
             _metroDialog = metroDialog;
             _eventAggregator = eventAggregator;
 
-            _eventAggregator.GetEvent<ImportExportAvailability>().Subscribe((state) => 
-            { 
+            _eventAggregator.GetEvent<ImportExportAvailabilityEvent>().Subscribe((state) =>
+            {
                 IsProgressBarVisible = !state;
             });
         }
@@ -46,7 +44,7 @@ namespace WpfApp1.ViewModel.ViewModels
                     (_pageIsLoadedCommand = new RelayCommand(obj =>
                     {
                         if (_repository.IsDBAvailable)
-                            ImportText = DefaultImportTextBoxMessage;
+                            ImportText = Properties.Resources.DefaultImportTextBoxMessage;
                     }));
             }
         }
@@ -63,47 +61,33 @@ namespace WpfApp1.ViewModel.ViewModels
                 return _readCsvFileAndAddToBDCommand ??
                     (_readCsvFileAndAddToBDCommand = new RelayCommand(async obj =>
                     {
-                        if (_repository.IsDBAvailable)
+                        try
                         {
-                            try
+                            if (_fileDialog.OpenFileDialog(out string fileName, Properties.Resources.OpenCsvFileExtensionFilter))
                             {
-                                if (_fileDialog.OpenFileDialog(out string fileName, OpenFileExtensionFilter))
+                                _repository.IsDBAvailable = false;
+
+                                ImportText = Properties.Resources.AwaitImport;
+
+                                var fileImporter = _importer.GetImporter(CsvImporterName);
+
+                                await foreach (List<User> listOfUsers in fileImporter.ReadFromFileAsync(fileName))
                                 {
-                                    _repository.IsDBAvailable = false;
-
-                                    ImportText = "Открытие файла и перенос данных могут занять некоторое время...";
-
-                                    var fileImporter = _importer.GetImporter(CsvImporterName);
-
-                                    await Task.Run(async () =>
-                                    {
-                                        await foreach (List<User> listOfUsers in fileImporter.ReadFromFileAsync(fileName))
-                                        {
-                                            await _repository.AddToDBAsync(listOfUsers);
-                                        }
-                                    });                                    
-
-                                    _repository.IsDBAvailable = true;
-
-                                    var viewModel = _metroDialog.ReturnViewModel();
-                                    await _metroDialog.ShowMessage(viewModel, "Импорт завершен!",
-                                        "Данные загружены в базу даных и готовы к экспорту.");
-
-                                    ImportText = "Данные загружены в базу даных и готовы к экспорту.";
+                                    await _repository.AddToDBAsync(listOfUsers);
                                 }
-                            }
-                            catch (Exception ex)
-                            {
-                                var viewModel = _metroDialog.ReturnViewModel();
-                                await _metroDialog.ShowMessage(viewModel, "Ошибка", ex.Message);
 
                                 _repository.IsDBAvailable = true;
+
+                                await _metroDialog.ShowMessage(Properties.Resources.HeaderImportCompleted,
+                                    Properties.Resources.DataImported);
+
+                                ImportText = Properties.Resources.DataImported;
                             }
                         }
-                        else
+                        catch (Exception ex)
                         {
-                            await _metroDialog.ShowMessage(this, "Пожалуйста, подождите!",
-                            "Еще не закончилась предыдущая операция. Повторите попытку позже.");
+                            await _metroDialog.ShowMessage(Properties.Resources.HeaderImportEx, ex.Message);
+                            _repository.IsDBAvailable = true;
                         }
                     }, x => _repository.IsDBAvailable));
             }

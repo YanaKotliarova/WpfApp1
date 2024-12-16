@@ -67,7 +67,6 @@ namespace WpfApp1
                 MainWindow window = new MainWindow();
                 window.Title = "CSV EXPORTER";
                 Current.Resources = app.MetroResources;
-
                 app.Run(window);
             }
         }

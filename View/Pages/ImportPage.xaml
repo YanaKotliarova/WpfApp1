@@ -8,6 +8,7 @@
       xmlns:Controls="http://metro.mahapps.com/winfx/xaml/controls"
       xmlns:Dialog="clr-namespace:MahApps.Metro.Controls.Dialogs;assembly=MahApps.Metro"
       Dialog:DialogParticipation.Register="{Binding}"
+      xmlns:res="clr-namespace:WpfApp1.Properties"
       
       xmlns:local="clr-namespace:WpfApp1.View.Pages" 
       xmlns:viewmodel="clr-namespace:WpfApp1.ViewModel.ViewModels" d:DataContext="{d:DesignInstance Type=viewmodel:ImportPageViewModel}"
@@ -33,7 +34,7 @@
             <ColumnDefinition Width="100"/>
         </Grid.ColumnDefinitions>
 
-        <Button Content="Назад" Grid.Column="0" Grid.Row="0"
+        <Button Content="{x:Static res:Resources.BackButton}" Grid.Column="0" Grid.Row="0"
                 Command="NavigationCommands.BrowseBack" Padding="3" MinHeight="25" MinWidth="35"
                 HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,10,0,0"/>
 
@@ -42,7 +43,7 @@
                  IsReadOnly="True" Text = "{Binding ImportText, UpdateSourceTrigger = PropertyChanged}" 
                  HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" BorderThickness="2,2,2,2" Margin="30,0,30,30"/>
 
-        <Button x:Name="buttonChooseFile" Content="Открыть"  
+        <Button x:Name="buttonChooseFile" Content="{x:Static res:Resources.ImportButton}"  
                 Grid.Column="1" Grid.Row="1"
                 Command="{Binding ReadCsvFileAndAddToBDCommand}"
                 VerticalAlignment="Top" HorizontalAlignment="Left" 

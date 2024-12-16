@@ -9,6 +9,7 @@
       xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity" 
       xmlns:Dialog="clr-namespace:MahApps.Metro.Controls.Dialogs;assembly=MahApps.Metro"
       xmlns:Controls="http://metro.mahapps.com/winfx/xaml/controls"
+      xmlns:res="clr-namespace:WpfApp1.Properties"
       
       xmlns:viewmodels="clr-namespace:WpfApp1.ViewModel.ViewModels" 
       d:DataContext="{d:DesignInstance Type=viewmodels:ViewFilePageViewModel}"
@@ -36,7 +37,7 @@
                 <ColumnDefinition Width="40"/>
             </Grid.ColumnDefinitions>
 
-            <Button Name="BackButton" Content="Назад" Grid.Column="0"
+            <Button Name="BackButton" Content="{x:Static res:Resources.BackButton}" Grid.Column="0"
                     Command="NavigationCommands.BrowseBack" 
                     Padding="3" MinHeight="25" MinWidth="35"
                     HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,10,0,0"/>
@@ -47,7 +48,7 @@
                      VerticalAlignment="Bottom" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled" 
                      IsReadOnly="True"/>
 
-            <Button Name="OpenFileButton" Content="Открыть" Grid.Column="1"
+            <Button Name="OpenFileButton" Content="{x:Static res:Resources.OpenFileButton}" Grid.Column="1"
                     Command="{Binding OpenFileCommand}"
                     Padding="3" MinHeight="25" MinWidth="35" 
                     HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,0,5"/>
@@ -59,12 +60,12 @@
               ScrollViewer.CanContentScroll="True" BorderThickness="2,2,2,2">
             <ListView.View>
                 <GridView>
-                    <GridViewColumn Header="Дата" DisplayMemberBinding="{Binding Path=Date}" Width="100"/>
-                    <GridViewColumn Header="Имя" DisplayMemberBinding="{Binding Path=FirstName}" Width="100"/>
-                    <GridViewColumn Header="Фамилия" DisplayMemberBinding="{Binding Path=LastName}" Width="100"/>
-                    <GridViewColumn Header="Отчество" DisplayMemberBinding="{Binding Path=Patronymic}" Width="100"/>
-                    <GridViewColumn Header="Город" DisplayMemberBinding="{Binding Path=City}" Width="100"/>
-                    <GridViewColumn Header="Страна" DisplayMemberBinding="{Binding Path=Country}" Width="100"/>
+                    <GridViewColumn Header="{x:Static res:Resources.DateWord}" DisplayMemberBinding="{Binding Path=Date}" Width="100"/>
+                    <GridViewColumn Header="{x:Static res:Resources.FirstNameWord}" DisplayMemberBinding="{Binding Path=FirstName}" Width="100"/>
+                    <GridViewColumn Header="{x:Static res:Resources.LastNameWord}" DisplayMemberBinding="{Binding Path=LastName}" Width="100"/>
+                    <GridViewColumn Header="{x:Static res:Resources.PatronymicWord}" DisplayMemberBinding="{Binding Path=Patronymic}" Width="100"/>
+                    <GridViewColumn Header="{x:Static res:Resources.CityWord}" DisplayMemberBinding="{Binding Path=City}" Width="100"/>
+                    <GridViewColumn Header="{x:Static res:Resources.CountryWord}" DisplayMemberBinding="{Binding Path=Country}" Width="100"/>
                 </GridView>
             </ListView.View>
         </ListView>

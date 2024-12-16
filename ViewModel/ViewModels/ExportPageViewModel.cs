@@ -16,8 +16,6 @@ namespace WpfApp1.ViewModel.ViewModels
         private const string ExcelExporterName = "ExcelExporter";
         private const string XmlExporterName = "XmlExporter";
 
-        private const string DefaultExportTextBoxMessage = "Введите данные для выборки, а затем нажмите кнопку экспорта.";
-
         private readonly IExporterFactory _exporter;
         private readonly IRepository<User> _repository;
         private readonly IDataFormatter _dataFormatter;
@@ -35,7 +33,7 @@ namespace WpfApp1.ViewModel.ViewModels
             _metroDialog = metroDialog;
             _eventAggregator = eventAggregator;
 
-            _eventAggregator.GetEvent<ImportExportAvailability>().Subscribe((state) =>
+            _eventAggregator.GetEvent<ImportExportAvailabilityEvent>().Subscribe((state) =>
             {
                 IsProgressBarVisible = !state;
             });
@@ -53,7 +51,7 @@ namespace WpfApp1.ViewModel.ViewModels
                     (_pageIsLoadedCommand = new RelayCommand(obj =>
                     {
                         if (_repository.IsDBAvailable)
-                            ExportText = DefaultExportTextBoxMessage;
+                            ExportText = Properties.Resources.DefaultExportTextBoxMessage;
                     }));
             }
         }
@@ -74,74 +72,66 @@ namespace WpfApp1.ViewModel.ViewModels
                 return _exportIntoFileCommand ??
                     (_exportIntoFileCommand = new RelayCommand(async obj =>
                     {
-                        if (_repository.IsDBAvailable)
+                        try
                         {
-                            try
+                            if (_fileDialog.SaveFileDialog(out string newFileName))
                             {
-                                if (_fileDialog.SaveFileDialog(out string newFileName))
+                                ExportText = Properties.Resources.AwaitExport;
+
+                                _repository.IsDBAvailable = false;
+                                _repository.WasExport = false;
+
+                                DateOnly? date = _dataFormatter.FormateDateTime(DatePicker);
+                                DatePicker = null;
+
+                                string firstName = _dataFormatter.FormateStringData(FirstNameTextBox);
+                                FirstNameTextBox = "";
+
+                                string lastName = _dataFormatter.FormateStringData(LastNameTextBox);
+                                LastNameTextBox = "";
+
+                                string patronymic = _dataFormatter.FormateStringData(PatronymicTextBox);
+                                PatronymicTextBox = "";
+
+                                string city = _dataFormatter.FormateStringData(CityTextBox);
+                                CityTextBox = "";
+
+                                string country = _dataFormatter.FormateStringData(CountryTextBox);
+                                CountryTextBox = "";
+
+                                PersonInfoStruct person = new PersonInfoStruct(firstName, lastName, patronymic);
+                                EntranceInfoStruct entranceInfo = new EntranceInfoStruct(date, city, country);
+
+                                await CreateFileAsync(newFileName);
+                                await Task.Run(async () =>
                                 {
-                                    ExportText = "Экспорт может занять некоторое время, пожалуйста подождите...";
-
-                                    _repository.IsDBAvailable = false;
-                                    _repository.WasExport = false;
-
-                                    DateOnly? date = _dataFormatter.FormateDateTime(DatePicker);
-                                    DatePicker = null;
-
-                                    string firstName = _dataFormatter.FormateStringData(FirstNameTextBox);
-                                    FirstNameTextBox = "";
-
-                                    string lastName = _dataFormatter.FormateStringData(LastNameTextBox);
-                                    LastNameTextBox = "";
-
-                                    string patronymic = _dataFormatter.FormateStringData(PatronymicTextBox);
-                                    PatronymicTextBox = "";
-
-                                    string city = _dataFormatter.FormateStringData(CityTextBox);
-                                    CityTextBox = "";
-
-                                    string country = _dataFormatter.FormateStringData(CountryTextBox);
-                                    CountryTextBox = "";
-
-                                    PersonInfoStruct person = new PersonInfoStruct(firstName, lastName, patronymic);
-                                    EntranceInfoStruct entranceInfo = new EntranceInfoStruct(date, city, country);
-
-                                    await CreateFileAsync(newFileName);
-                                    await Task.Run(async () =>
+                                    await foreach (List<User> listOfUsers in _repository.GetSelectionFromDBAsync(person, entranceInfo))
                                     {
-                                        await foreach (List<User> listOfUsers in _repository.GetSelectionFromDBAsync(person, entranceInfo))
-                                        {
-                                            if (listOfUsers.Count > 0)
-                                                await AddToFileAsync(newFileName, listOfUsers);
+                                        if (listOfUsers.Count > 0)
+                                            await AddToFileAsync(newFileName, listOfUsers);
 
-                                            listOfUsers.Clear();
-                                        }
-                                    });
-
-                                    _repository.IsDBAvailable = true;
-                                    _repository.WasExport = true;
-
-                                    var viewModel = _metroDialog.ReturnViewModel();
-                                    await _metroDialog.ShowMessage(viewModel, "Экспорт завершён!",
-                                        "Файл " + newFileName + " был успешно создан.");
-
-                                    ExportText = $"Созданную выборку можно увидеть в созданном файле: \"{newFileName}\" " +
-                                    $"либо на вкладке \"Просмотр\"";
-                                }
-                            }
-                            catch (Exception ex)
-                            {
-                                var viewModel = _metroDialog.ReturnViewModel();
-                                await _metroDialog.ShowMessage(viewModel, "При создании файла произошла ошибка", ex.Message);
+                                        listOfUsers.Clear();
+                                    }
+                                });
 
                                 _repository.IsDBAvailable = true;
-                                _repository.WasExport = false;
+                                _repository.WasExport = true;
+
+                                await _metroDialog.ShowMessage(Properties.Resources.HeaderExportCompleted,
+                                    String.Format(Properties.Resources.FileCreatedSuccesfully, newFileName));
+
+                                ExportText = String.Format(Properties.Resources.CreatedSelectionView, newFileName);
                             }
                         }
-                        else await _metroDialog.ShowMessage(this, "Пожалуйста, подождите!",
-                            "Еще не закончилась предыдущая операция. Повторите попытку позже.");
+                        catch (Exception ex)
+                        {
+                            await _metroDialog.ShowMessage(Properties.Resources.HeaderExportEx, ex.Message);
+
+                            _repository.IsDBAvailable = true;
+                            _repository.WasExport = false;
+                        }
                     }, x => _repository.IsDBAvailable));
-            }
+        }
         }
 
         private string _exportTextBoxText;
@@ -189,11 +179,6 @@ namespace WpfApp1.ViewModel.ViewModels
                 var fileExporter = _exporter.GetExporter(XmlExporterName);
                 await fileExporter.CreateFileAsync(newFileName);
             }
-            else
-            {
-                throw new Exception("Выберите формат файла!");
-            }
-
         }
 
         /// <summary>
@@ -225,7 +210,7 @@ namespace WpfApp1.ViewModel.ViewModels
         private void TextBoxDataValidating(string? textBoxData)
         {
             if (!string.IsNullOrEmpty(textBoxData) && !textBoxData.All(char.IsLetter))
-                throw new Exception("Возможен только буквенный ввод!");
+                throw new Exception(Properties.Resources.ExLetterInput);
         }
 
         private DateTime? _datePicker;
@@ -277,7 +262,7 @@ namespace WpfApp1.ViewModel.ViewModels
                 }
                 catch (Exception ex)
                 {
-                    _metroDialog.ShowMessage(this, "Неверный ввод", ex.Message);
+                    _metroDialog.ShowMessage(Properties.Resources.HeaderInvalidImput, ex.Message);
                 }
 
             }
@@ -302,7 +287,7 @@ namespace WpfApp1.ViewModel.ViewModels
                 }
                 catch (Exception ex)
                 {
-                    _metroDialog.ShowMessage(this, "Неверный ввод", ex.Message);
+                    _metroDialog.ShowMessage(Properties.Resources.HeaderInvalidImput, ex.Message);
                 }
             }
         }
@@ -326,7 +311,7 @@ namespace WpfApp1.ViewModel.ViewModels
                 }
                 catch (Exception ex)
                 {
-                    _metroDialog.ShowMessage(this, "Неверный ввод", ex.Message);
+                    _metroDialog.ShowMessage(Properties.Resources.HeaderInvalidImput, ex.Message);
                 }
             }
         }
@@ -350,7 +335,7 @@ namespace WpfApp1.ViewModel.ViewModels
                 }
                 catch (Exception ex)
                 {
-                    _metroDialog.ShowMessage(this, "Неверный ввод", ex.Message);
+                    _metroDialog.ShowMessage(Properties.Resources.HeaderInvalidImput, ex.Message);
                 }
             }
         }
@@ -374,7 +359,7 @@ namespace WpfApp1.ViewModel.ViewModels
                 }
                 catch (Exception ex)
                 {
-                    _metroDialog.ShowMessage(this, "Неверный ввод", ex.Message);
+                    _metroDialog.ShowMessage(Properties.Resources.HeaderInvalidImput, ex.Message);
                 }
             }
         }

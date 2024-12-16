@@ -58,7 +58,7 @@ namespace WpfApp1.Services.Import
                         }
                     }
                 }
-                else throw new Exception("В Excel файле нет доступной страницы или он пуст");
+                else throw new Exception(Properties.Resources.ExExcelFileIsEmpty);
             }
         }
     }

@@ -7,6 +7,8 @@
       xmlns:Controls="http://metro.mahapps.com/winfx/xaml/controls"
       xmlns:Dialog="clr-namespace:MahApps.Metro.Controls.Dialogs;assembly=MahApps.Metro"
       Dialog:DialogParticipation.Register="{Binding}"
+      xmlns:res="clr-namespace:WpfApp1.Properties"
+      xmlns:sys="clr-namespace:System;assembly=mscorlib"
       
       xmlns:local="clr-namespace:WpfApp1.View.Pages"
       xmlns:n="clr-namespace:WpfApp1"      
@@ -33,30 +35,37 @@
 
     <Grid Background="White">
 
-        <n:NavigationButton x:Name ="ImportButton" Text="Импорт" HorizontalAlignment="Left" VerticalAlignment="Top" 
+        <n:NavigationButton x:Name ="ImportButton" Text="{x:Static res:Resources.ImportButton}"
+                            HorizontalAlignment="Left" VerticalAlignment="Top" 
                             MinHeight="70" MinWidth="60" Margin="10,10,0,0"
                             Command="{Binding OpenPageCommand}" CommandParameter="{Binding ElementName=ImportButton}"
                             ImageSource="/View/Images/Import.png" NavigationUri="/View/Pages/ImportPage.xaml" FontWeight="Bold"/>
 
-        <n:NavigationButton x:Name ="ExportButton" Text="Экспорт" HorizontalAlignment="Left" VerticalAlignment="Top" 
+        <n:NavigationButton x:Name ="ExportButton" Text="{x:Static res:Resources.ExportButton}" 
+                            HorizontalAlignment="Left" VerticalAlignment="Top" 
                             MinHeight="70" MinWidth="60"
                             Command="{Binding OpenPageCommand}" CommandParameter="{Binding ElementName=ExportButton}"
                             ImageSource="/View/Images/Export.png" NavigationUri="/View/Pages/ExportPage.xaml" Margin="87,10,0,0"
                             IsEnabled="{Binding IsExportAvailable}" Style="{StaticResource NavButtonStyle}" FontWeight="Bold"/>
 
-        <n:NavigationButton x:Name ="ViewSelectionButton" Text="Просмотр&#xa;выборки" HorizontalAlignment="Left" 
+        <n:NavigationButton x:Name ="ViewSelectionButton" Text="{x:Static res:Resources.ViewSelectionButton}" 
+                            HorizontalAlignment="Left" 
                             VerticalAlignment="Top" MinHeight="70" MinWidth="60"
                             Command="{Binding OpenPageCommand}" CommandParameter="{Binding ElementName=ViewSelectionButton}"
                             ImageSource="/View/Images/ViewFromDB.png" NavigationUri="/View/Pages/ViewSelectionPage.xaml" 
                             Margin="164,10,0,0" 
                             IsEnabled="{Binding IsViewingAvailable}" Style="{StaticResource NavButtonStyle}" FontWeight="Bold"/>
 
-        <n:NavigationButton x:Name ="ViewFileButton" Text="Просмотр&#xa;файла" HorizontalAlignment="Left" VerticalAlignment="Top" 
+        <n:NavigationButton x:Name ="ViewFileButton" Text="{x:Static res:Resources.ViewFileButton}" 
+                            HorizontalAlignment="Left" VerticalAlignment="Top" 
                             MinHeight="70" MinWidth="60"
                             Command="{Binding OpenPageCommand}" CommandParameter="{Binding ElementName=ViewFileButton}"
                             ImageSource="/View/Images/ViewFromFile.png" NavigationUri="/View/Pages/ViewFilePage.xaml" 
                             Margin="241,10,0,0" 
                             IsEnabled="{Binding IsViewingAvailable}" Style="{StaticResource NavButtonStyle}" FontWeight="Bold"/>
+
+        <ComboBox Name="LanguageComboBox" Height="25" Width="60" HorizontalAlignment="Right" VerticalAlignment="Top" 
+                  Margin="0,10,10,0" ItemsSource="{Binding Languages}" SelectedItem="{Binding Language, Mode=TwoWay}"/>
         
     </Grid>
 

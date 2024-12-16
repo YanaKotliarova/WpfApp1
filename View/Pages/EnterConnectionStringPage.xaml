@@ -7,9 +7,11 @@
       xmlns:Controls="http://metro.mahapps.com/winfx/xaml/controls"
       xmlns:Dialog="clr-namespace:MahApps.Metro.Controls.Dialogs;assembly=MahApps.Metro"
       Dialog:DialogParticipation.Register="{Binding}"
+      xmlns:res="clr-namespace:WpfApp1.Properties"
       
       xmlns:local="clr-namespace:WpfApp1.View.Pages"
-      x:Class="WpfApp1.View.Pages.EnterConnectionStringPage"
+      x:Class="WpfApp1.View.Pages.EnterConnectionStringPage"      
+    
       mc:Ignorable="d" 
       d:DesignHeight="450" d:DesignWidth="800"
       Title="EnterConnectionStringPage"
@@ -32,7 +34,7 @@
         </Grid.ColumnDefinitions>
 
         <Label x:Name="labelEnterConnectionString" Grid.Row="0" Grid.ColumnSpan="2"
-               Content="Введите релевантную строку подключения в БД:" FontSize="20" HorizontalAlignment="Left" 
+               Content="{x:Static res:Resources.EnterConnectionString}" FontSize="20" HorizontalAlignment="Left" 
                Margin="23,0,0,0" VerticalAlignment="Bottom"/>
 
         <TextBox x:Name ="textBoxNewConnectionString" Grid.Row="1" Grid.Column="0"
@@ -44,7 +46,7 @@
                  VerticalAlignment="Top" FontSize="14" HorizontalAlignment="Left" Margin="25,0,0,0"
                  Controls:TextBoxHelper.ClearTextButton="True"/>
 
-        <Button x:Name="EnterButton" Content="Ввод"
+        <Button x:Name="EnterButton" Content="{x:Static res:Resources.EnterButton}"
                 Grid.Row="1" Grid.Column="2" HorizontalAlignment="Center" VerticalAlignment="Top"
                 MinWidth="65" MinHeight="25"
                 Command="{Binding ReinitializeDBCommand}" CommandParameter="{Binding ElementName=ConnectionStringPage}"

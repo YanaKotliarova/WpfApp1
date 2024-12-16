@@ -8,9 +8,11 @@
       xmlns:Controls="http://metro.mahapps.com/winfx/xaml/controls"
       xmlns:Dialog="clr-namespace:MahApps.Metro.Controls.Dialogs;assembly=MahApps.Metro"
       Dialog:DialogParticipation.Register="{Binding}"
+      xmlns:res="clr-namespace:WpfApp1.Properties"
      
       xmlns:local="clr-namespace:WpfApp1.View.Pages" 
-      xmlns:viewmodel="clr-namespace:WpfApp1.ViewModel.ViewModels" d:DataContext="{d:DesignInstance Type=viewmodel:ExportPageViewModel}"
+      xmlns:viewmodel="clr-namespace:WpfApp1.ViewModel.ViewModels" 
+      d:DataContext="{d:DesignInstance Type=viewmodel:ExportPageViewModel}"
       
       mc:Ignorable="d" 
       d:DesignHeight="450" d:DesignWidth="800"
@@ -35,7 +37,7 @@
             <ColumnDefinition Width="0.3*"/>
         </Grid.ColumnDefinitions>
 
-        <Button Content="Назад" Grid.Column="0" Grid.Row="0"
+        <Button Content="{x:Static res:Resources.BackButton}" Grid.Column="0" Grid.Row="0"
                 Command="NavigationCommands.BrowseBack" Padding="3" MinHeight="25" MinWidth="35"
                 HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,10,0,0"/>
 
@@ -44,7 +46,7 @@
                  IsReadOnly="True" Text = "{Binding ExportText, UpdateSourceTrigger = PropertyChanged}" 
                  HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" Margin="10,0,0,0" BorderThickness="2,2,2,2"/>
 
-        <Button x:Name="buttonExport" Content="Экспорт"
+        <Button x:Name="buttonExport" Content="{x:Static res:Resources.ExportButton}"
                 Grid.Column="3" Grid.Row="2" 
                 MinWidth="65" MinHeight="25"
                 Command="{Binding ExportIntoFileCommand}"
@@ -59,8 +61,10 @@
 
         <DatePicker x:Name="datePicker" Grid.Column="1" Grid.Row="2"
                     SelectedDate="{Binding DatePicker}" VerticalAlignment="Top" 
-                    VerticalContentAlignment="Center" HorizontalAlignment="Left" 
-                    Margin="95,55,0,0" MinHeight="25" MinWidth="155" Controls:TextBoxHelper.ClearTextButton="True"/>
+                    VerticalContentAlignment="Center" HorizontalAlignment="Left"
+                    Margin="95,55,0,0" MinHeight="25" MinWidth="155" 
+                    Controls:TextBoxHelper.Watermark="{x:Static res:Resources.ChooseDate}"
+                    Controls:TextBoxHelper.ClearTextButton="True"/>
 
         <TextBox x:Name="textBoxFirstName" Grid.Column="0" Grid.Row="2"
                  Text="{Binding FirstNameTextBox, UpdateSourceTrigger=PropertyChanged, ValidatesOnExceptions=True}"
@@ -92,31 +96,38 @@
                  MinWidth="155" MinHeight="25" Margin="95,125,0,0" HorizontalAlignment="Left"
                  Controls:TextBoxHelper.ClearTextButton="True"/>
 
-        <Label x:Name="labelFirstName" Grid.Column="0" Grid.Row="2" Content="Имя:" HorizontalContentAlignment="Stretch" 
+        <Label x:Name="labelFirstName" Grid.Column="0" Grid.Row="2" 
+               Content="{x:Static res:Resources.FirstNameWord}" HorizontalContentAlignment="Stretch" 
                VerticalContentAlignment="Stretch" HorizontalAlignment="Left" VerticalAlignment="Top" 
                Margin="20,55,0,0" MinWidth="65"/>
 
-        <Label x:Name="labelLastName" Grid.Column="0" Grid.Row="2" Content="Фамилия:" HorizontalAlignment="Left" 
+        <Label x:Name="labelLastName" Grid.Column="0" Grid.Row="2" 
+               Content="{x:Static res:Resources.LastNameWord}" HorizontalAlignment="Left" 
                VerticalAlignment="Top" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" 
                Margin="20,90,0,0" MinWidth="65"/>
 
-        <Label x:Name="labelPatronymic" Grid.Column="0" Grid.Row="2" Content="Отчество:" 
+        <Label x:Name="labelPatronymic" Grid.Column="0" Grid.Row="2" 
+               Content="{x:Static res:Resources.PatronymicWord}" 
                HorizontalAlignment="Left" VerticalAlignment="Top" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" 
                Margin="18,125,0,0" MinWidth="65"/>
 
-        <Label x:Name="labelDate" Grid.Column="1" Grid.Row="2" Content="Дата:" HorizontalAlignment="Left" 
+        <Label x:Name="labelDate" Grid.Column="1" Grid.Row="2" 
+               Content="{x:Static res:Resources.DateWord}" HorizontalAlignment="Left" 
                VerticalAlignment="Top" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" 
                Margin="20,55,0,0" MinWidth="65"/>
 
-        <Label x:Name="labelCity" Grid.Column="1" Grid.Row="2" Content="Город:" HorizontalAlignment="Left" 
+        <Label x:Name="labelCity" Grid.Column="1" Grid.Row="2" 
+               Content="{x:Static res:Resources.CityWord}" HorizontalAlignment="Left" 
                VerticalAlignment="Top" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" 
                Margin="20,90,0,0" MinWidth="65"/>
 
-        <Label x:Name="labelCountry" Grid.Column="1" Grid.Row="2" Content="Страна:" HorizontalAlignment="Left" 
+        <Label x:Name="labelCountry" Grid.Column="1" Grid.Row="2" 
+               Content="{x:Static res:Resources.CountryWord}" HorizontalAlignment="Left" 
                VerticalAlignment="Top" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" 
                Margin="20,125,0,0" MinWidth="65"/>
 
-        <Label x:Name="labelExplanation" Grid.ColumnSpan="2" Grid.Row="2" Content="Введите данные для выборки для экспорта:" 
+        <Label x:Name="labelExplanation" Grid.ColumnSpan="2" Grid.Row="2" 
+               Content="{x:Static res:Resources.EnterDataForSelection}"
                VerticalAlignment="Top" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" 
                Margin="20,20,0,0" FontWeight="Bold"/>
     </Grid>

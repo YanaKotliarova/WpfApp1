@@ -6,7 +6,7 @@ namespace WpfApp1.Data.Database
     internal class DataFormatter : IDataFormatter
     {
         private const string Percent = "%";
-        private const string DateFormat = "yyyy-MM-dd";
+        private const string DbDateFormat = "yyyy-MM-dd";
 
         /// <summary>
         /// The method of converting the date to the DB format.
@@ -16,7 +16,7 @@ namespace WpfApp1.Data.Database
         public string FormateDateOnly(DateOnly? dateOnly)
         {
             string date;
-            if (dateOnly.HasValue) date = dateOnly.Value.ToString(DateFormat);
+            if (dateOnly.HasValue) date = dateOnly.Value.ToString(DbDateFormat);
             else date = Percent;
             return date;
         }
